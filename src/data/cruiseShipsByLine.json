@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "generatedAt": "2026-02-18T05:45:13.271Z",
+    "source": "Wikidata Query Service",
+    "linesNotFound": [
+      "Riviera Travel",
+      "Scenic River Cruises",
+      "Uniworld Boutique River Cruise Collection"
+    ],
+    "linesNoShipsReturned": [
+      "AmaWaterways",
+      "Atlas Ocean Voyages",
+      "Aurora Expeditions",
+      "Avalon Waterways",
+      "Emerald Cruises",
+      "HX",
+      "Ponant",
+      "Quark Expeditions",
+      "Scenic Eclipse",
+      "Seabourn",
+      "Tauck",
+      "The Ritz-Carlton Yacht Collection"
+    ]
+  },
+  "segments": {
+    "mass_market": [
+      "Royal Caribbean",
+      "Carnival Cruise Line",
+      "Norwegian Cruise Line",
+      "MSC Cruises",
+      "Costa Cruises"
+    ],
+    "premium": [
+      "Celebrity Cruises",
+      "Princess Cruises",
+      "Holland America Line",
+      "Cunard Line",
+      "Virgin Voyages",
+      "Disney Cruise Line"
+    ],
+    "luxury": [
+      "Oceania Cruises",
+      "Viking Ocean Cruises",
+      "Azamara",
+      "Windstar Cruises"
+    ],
+    "ultra_luxury": [
+      "Regent Seven Seas Cruises",
+      "Seabourn",
+      "Silversea Cruises",
+      "Explora Journeys",
+      "The Ritz-Carlton Yacht Collection",
+      "Crystal Cruises"
+    ],
+    "expedition": [
+      "Ponant",
+      "Hurtigruten",
+      "HX",
+      "Lindblad Expeditions",
+      "Quark Expeditions",
+      "Atlas Ocean Voyages",
+      "Aurora Expeditions",
+      "Scenic Eclipse"
+    ],
+    "river": [
+      "Viking River Cruises",
+      "AmaWaterways",
+      "Uniworld Boutique River Cruise Collection",
+      "Avalon Waterways",
+      "Scenic River Cruises",
+      "Tauck",
+      "CroisiEurope",
+      "Emerald Cruises",
+      "Riviera Travel"
+    ]
+  },
+  "shipsByLine": {
+    "Azamara": [
+      "Azamara Journey",
+      "Azamara Pursuit",
+      "Azamara Quest"
+    ],
+    "Carnival Cruise Line": [
+      "AIDAnova",
+      "Queen Mary 2"
+    ],
+    "Celebrity Cruises": [
+      "Celebrity Ascent",
+      "Celebrity Constellation",
+      "Celebrity Eclipse",
+      "Celebrity Edge",
+      "Celebrity Equinox",
+      "Celebrity Infinity",
+      "Celebrity Millennium",
+      "Celebrity Reflection",
+      "Celebrity Silhouette",
+      "Celebrity Solstice",
+      "Celebrity Summit",
+      "Marella Explorer",
+      "Marella Explorer 2",
+      "Marella Voyager",
+      "Mein Schiff 3",
+      "Mein Schiff 4",
+      "Mein Schiff 5",
+      "Mein Schiff 6",
+      "Q65063485",
+      "SS Galileo Galilei"
+    ],
+    "Costa Cruises": [
+      "Adora Mediterranea",
+      "AIDAluna",
+      "Andrea C",
+      "Carnival Luminosa",
+      "Costa Classica",
+      "Costa Concordia",
+      "Costa Deliziosa",
+      "Costa Diadema",
+      "Costa Fortuna",
+      "Costa neoRomantica",
+      "Costa Pacifica",
+      "Costa Serena",
+      "Costa Victoria",
+      "Goddess of the Night",
+      "Indrapoera",
+      "Margaritaville at Sea Islander",
+      "Oslofjord"
+    ],
+    "CroisiEurope": [
+      "Q5134378"
+    ],
+    "Crystal Cruises": [
+      "Crystal Esprit"
+    ],
+    "Cunard Line": [
+      "MS Queen Anne",
+      "MS Queen Elizabeth",
+      "MS Queen Victoria",
+      "Queen Mary 2",
+      "RMS Mauretania"
+    ],
+    "Disney Cruise Line": [
+      "Disney Adventure",
+      "Disney Destiny",
+      "Disney Dream",
+      "Disney Fantasy",
+      "Disney Treasure"
+    ],
+    "Explora Journeys": [
+      "Explora I",
+      "Explora II"
+    ],
+    "Holland America Line": [
+      "Borealis",
+      "Marella Celebration",
+      "MS Eurodam",
+      "MS Koningsdam",
+      "MS Nieuw Amsterdam",
+      "MS Nieuw Statendam",
+      "MS Noordam",
+      "MS Prinsendam",
+      "MS Veendam",
+      "MS Volendam",
+      "MS Westerdam",
+      "MS Zuiderdam",
+      "MV Seabourn Ovation",
+      "MV Seabourn Quest",
+      "MV Seabourn Sojourn",
+      "Renaissance",
+      "Rhine Forest",
+      "Rotterdam",
+      "Seabourn Encore",
+      "Seabourn Odyssey",
+      "SS Nieuw Amsterdam",
+      "SS Rijndam"
+    ],
+    "Hurtigruten": [
+      "Kong Harald",
+      "MF Sundferja",
+      "MS Finnmarken",
+      "MS Fram",
+      "MS Lofoten",
+      "MS Midnatsol",
+      "MS Nordkapp",
+      "MS Polarlys",
+      "MS Spitsbergen",
+      "MS Trollfjord",
+      "MS Vesterålen",
+      "Nordlys",
+      "Nordnorge",
+      "Polar Star",
+      "Polarlys",
+      "Richard With"
+    ],
+    "Lindblad Expeditions": [
+      "National Geographic Gemini"
+    ],
+    "MSC Cruises": [
+      "Costa Smeralda",
+      "MS Achille Lauro",
+      "MS Oranje",
+      "MSC Armonia",
+      "MSC Bellissima",
+      "MSC Divina",
+      "MSC Euribia",
+      "MSC Fantasia",
+      "MSC Lirica",
+      "MSC Magnifica",
+      "MSC Meraviglia",
+      "MSC Musica",
+      "MSC Opera",
+      "MSC Orchestra",
+      "MSC Poesia",
+      "MSC Preziosa",
+      "MSC Seascape",
+      "MSC Seashore",
+      "MSC Seaside",
+      "MSC Seaview",
+      "MSC Sinfonia",
+      "MSC Splendida",
+      "MSC Virtuosa",
+      "MSC World America",
+      "MSC World Europa"
+    ],
+    "Norwegian Cruise Line": [
+      "Norwegian Aqua",
+      "Norwegian Breakaway",
+      "Norwegian Dawn",
+      "Norwegian Encore",
+      "Norwegian Escape",
+      "Norwegian Gem",
+      "Norwegian Getaway",
+      "Norwegian Jewel",
+      "Norwegian Pearl",
+      "Norwegian Sky",
+      "Norwegian Star",
+      "Norwegian Viva",
+      "Pride of America"
+    ],
+    "Oceania Cruises": [
+      "MS Insignia",
+      "MS Marina",
+      "MS Sirena",
+      "Regatta"
+    ],
+    "Princess Cruises": [
+      "Azamara Onward",
+      "Azamara Pursuit",
+      "Coral Princess",
+      "Diamond Princess",
+      "Discovery Princess",
+      "Emerald Princess",
+      "Grand Princess",
+      "Island Princess",
+      "Majestic Princess",
+      "MS Sirena",
+      "Pacific Adventure",
+      "Pacific Encounter",
+      "Q3019252",
+      "Regal Princess",
+      "Ruby Princess"
+    ],
+    "Regent Seven Seas Cruises": [
+      "Seven Seas Explorer",
+      "Seven Seas Grandeur",
+      "Seven Seas Mariner",
+      "Seven Seas Navigator",
+      "Seven Seas Splendor",
+      "Seven Seas Voyager"
+    ],
+    "Royal Caribbean": [
+      "Adventure of the Seas",
+      "Allure of the Seas",
+      "Anthem of the Seas",
+      "Azamara Quest",
+      "Blue Sapphire",
+      "Enchantment of the Seas",
+      "Explorer of the Seas",
+      "Freedom of the Seas",
+      "Harmony of the Seas",
+      "Icon of the Seas",
+      "Independence of the Seas",
+      "Island Escape",
+      "Jewel of the Seas",
+      "Legend of the Seas",
+      "Liberty of the Seas",
+      "Majesty of the Oceans",
+      "Marella Discovery",
+      "Mariner of the Seas",
+      "MS Empress",
+      "MS Grandeur of the Seas",
+      "MS Radiance of the Seas",
+      "MS Rhapsody of the Seas",
+      "MS Serenade of the Seas",
+      "MS Vision of the Seas",
+      "MV Ocean Pearl",
+      "MV Ocean Star Pacific",
+      "MV Sun Viking",
+      "Navigator of the Seas",
+      "Oasis of the Seas",
+      "Odyssey of the Seas",
+      "Ovation of the Seas",
+      "Q123134298",
+      "Quantum of the Seas",
+      "Spectrum of the Seas",
+      "Symphony of the Seas",
+      "Voyager of the Seas",
+      "Wonder of the Seas"
+    ],
+    "Silversea Cruises": [
+      "MS Silver Wind",
+      "MV Silver Whisper",
+      "Silver Cloud",
+      "Silver Endeavour",
+      "Silver Muse",
+      "Silver Origin",
+      "Silver Shadow"
+    ],
+    "Viking Ocean Cruises": [
+      "MV Viking Sky",
+      "Viking Sea",
+      "Viking Star",
+      "Zhao Shang Yi Dun"
+    ],
+    "Viking River Cruises": [
+      "Viking Lif",
+      "Viking Truvor"
+    ],
+    "Virgin Voyages": [
+      "Scarlet Lady"
+    ],
+    "Windstar Cruises": [
+      "Star Pride"
+    ]
+  }
+}

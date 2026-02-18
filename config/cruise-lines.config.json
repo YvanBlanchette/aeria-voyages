@@ -1,0 +1,18 @@
+{
+	"mass_market": ["Royal Caribbean", "Carnival Cruise Line", "Norwegian Cruise Line", "MSC Cruises", "Costa Cruises"],
+	"premium": ["Celebrity Cruises", "Princess Cruises", "Holland America Line", "Cunard Line", "Virgin Voyages", "Disney Cruise Line"],
+	"luxury": ["Oceania Cruises", "Viking Ocean Cruises", "Azamara", "Windstar Cruises"],
+	"ultra_luxury": ["Regent Seven Seas Cruises", "Seabourn", "Silversea Cruises", "Explora Journeys", "The Ritz-Carlton Yacht Collection", "Crystal Cruises"],
+	"expedition": ["Ponant", "Hurtigruten", "HX", "Lindblad Expeditions", "Quark Expeditions", "Atlas Ocean Voyages", "Aurora Expeditions", "Scenic Eclipse"],
+	"river": [
+		"Viking River Cruises",
+		"AmaWaterways",
+		"Uniworld Boutique River Cruise Collection",
+		"Avalon Waterways",
+		"Scenic River Cruises",
+		"Tauck",
+		"CroisiEurope",
+		"Emerald Cruises",
+		"Riviera Travel"
+	]
+}
