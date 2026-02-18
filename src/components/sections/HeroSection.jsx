@@ -2,7 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import heroVideo from "@/assets/videos/hero.mp4";
+import heroVideo from "@/assets/videos/hero.webm";
 
 const HeroSection = () => {
 	return (
