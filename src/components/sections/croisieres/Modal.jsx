@@ -121,7 +121,7 @@ export default function Modal({ c, onClose }) {
 								</div>
 
 								{/* BOUTONS CTA */}
-								<div className="flex flex-col sm:flex-row gap-2">
+								<div className="flex flex-col gap-2">
 									{/* MESSENGER */}
 									<a
 										href={msgUrl}
