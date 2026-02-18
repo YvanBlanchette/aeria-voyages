@@ -77,11 +77,11 @@ export default function CroisieresSection() {
 	return (
 		<section
 			id="croisieres"
-			className="py-20 bg-linear-to-b from-[#F5F2EB] to-[#FFFFFF]"
+			className="py-20 bg-[#F5F2EB]"
 		>
 			<div className="max-w-7xl mx-auto">
 				{/* En-tête */}
-				<div className="text-center mb-14">
+				<div className="text-center mb-14 px-4 lg:px-0">
 					<Badge
 						variant="outline"
 						className="text-xs tracking-[0.4em] uppercase mb-4 rounded-xs"
@@ -102,7 +102,7 @@ export default function CroisieresSection() {
 				</div>
 
 				{/* Filtres */}
-				<div className="h-28">
+				<div className="px-4 lg:px-0 mb-8">
 					<div className="flex flex-wrap gap-3 items-start">
 						<MultiSelect
 							placeholder="Destination"

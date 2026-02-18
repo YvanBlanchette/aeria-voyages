@@ -32,14 +32,13 @@ export default function MultiSelect({ placeholder, options, selected, onChange }
 
 	return (
 		<div
-			className="relative"
+			className="relative w-full sm:w-auto"
 			ref={ref}
 		>
 			<button
 				onClick={() => setOpen((o) => !o)}
-				className={`cursor-pointer flex items-center gap-2 text-sm px-4 py-2.5 border transition-all duration-200 min-w-[215px] justify-between bg-white ${
-					open || hasSelection ? "border-[#B8935C] shadow-sm" : "border-stone-200 hover:border-stone-300"
-				}`}
+				className={`cursor-pointer flex items-center gap-2 text-sm px-4 py-2.5 border transition-all duration-200 
+    w-full sm:min-w-[215px] justify-between bg-white ${open || hasSelection ? "border-[#B8935C] shadow-sm" : "border-stone-200 hover:border-stone-300"}`}
 			>
 				<span className={hasSelection ? "text-stone-800 font-medium" : "text-stone-400"}>{label}</span>
 				<div className="flex items-center gap-1.5 shrink-0">
@@ -60,7 +59,10 @@ export default function MultiSelect({ placeholder, options, selected, onChange }
 			</button>
 
 			{open && (
-				<div className="absolute top-full left-0  bg-white border border-stone-200 shadow-xl z-40 py-1.5 min-w-[215px] max-h-72 overflow-y-auto">
+				<div
+					className="absolute top-full left-0 bg-white border border-stone-200 shadow-xl z-40 py-1.5 
+    w-full sm:min-w-[215px] max-h-72 overflow-y-auto"
+				>
 					{options.map((opt) => {
 						const isSel = selected.includes(opt.value);
 						const isDisabled = opt.disabled;

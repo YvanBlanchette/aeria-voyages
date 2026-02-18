@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><style>
+    #light-icon {
+      display: inline;
+    }
+    #dark-icon {
+      display: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #light-icon {
+        display: none;
+      }
+      #dark-icon {
+        display: inline;
+      }
+    }
+  </style><g id="light-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g><g transform="matrix(2.807175139656963,0,0,2.807175139656963,5.684341886080802e-14,41.77076607809562)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="356.23" height="326.47"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 356.23 326.47"><path d="m167.23,317.47v-90h-79.78l-46.64,90H14.73L170.73,13.1h165.7v22.09h-110.46v104.73h99.17v22.09h-99.17v133.37h121.26v22.09h-180Zm0-112.1V73.65l-68.47,131.71h68.47Z"></path><path d="m327.43,22.1v4.09h-110.46v122.73h99.17v4.09h-99.17v151.37h121.26v4.09h-162v-90h-94.25l-46.64,90h-5.89L176.23,22.1h151.2M83.94,214.37h92.29V36.83l-92.29,177.54M345.43,4.1h-180.2l-5.02,9.79L13.43,300.26l-13.43,26.21h46.29l5.04-9.72,41.6-80.28h65.3v90h198v-40.09h-121.26v-115.37h99.17v-40.09h-99.17V44.19h110.46V4.1h0ZM113.59,196.37l44.65-85.89v85.89h-44.65Z"></path></svg></svg></g></g></svg></g><g id="dark-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g><g transform="matrix(2.807175139656963,0,0,2.807175139656963,5.684341886080802e-14,41.77076607809562)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="356.23" height="326.47"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 356.23 326.47"><defs><style>.cls-1{fill:#fff;}</style></defs><path class="cls-1" d="m167.23,317.47v-90h-79.78l-46.64,90H14.73L170.73,13.1h165.7v22.09h-110.46v104.73h99.17v22.09h-99.17v133.37h121.26v22.09h-180Zm0-112.1V73.65l-68.47,131.71h68.47Z"></path><path class="cls-1" d="m327.43,22.1v4.09h-110.46v122.73h99.17v4.09h-99.17v151.37h121.26v4.09h-162v-90h-94.25l-46.64,90h-5.89L176.23,22.1h151.2M83.94,214.37h92.29V36.83l-92.29,177.54M345.43,4.1h-180.2l-5.02,9.79L13.43,300.26l-13.43,26.21h46.29l5.04-9.72,41.6-80.28h65.3v90h198v-40.09h-121.26v-115.37h99.17v-40.09h-99.17V44.19h110.46V4.1h0ZM113.59,196.37l44.65-85.89v85.89h-44.65Z"></path></svg></svg></g></g></svg></g></svg>

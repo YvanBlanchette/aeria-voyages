@@ -1,13 +1,22 @@
-import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Youtube, MessageCircle, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import logoLight from "@/assets/images/aeria-logo-light.svg";
+import { socialLinks } from "@/lib/data";
+
+// Mapping des icônes
+const iconMap = {
+	facebook: Facebook,
+	instagram: Instagram,
+	youtube: Youtube,
+	messenger: MessageCircle, // Ou Facebook si vous préférez
+};
 
 const Footer = () => {
 	return (
 		<footer className="bg-dark text-white py-16 px-6">
 			<div className="max-w-7xl mx-auto">
-				<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+				<div className="flex justify-between gap-12 mb-12">
 					{/* Brand */}
 					<div>
 						<img
@@ -15,60 +24,38 @@ const Footer = () => {
 							alt="ÆRIA Voyages"
 							className="h-10 w-auto mb-3"
 						/>
-						<p className="text-sm text-muted-foreground leading-relaxed mb-4">
-							Votre partenaire de voyage de luxe pour des expériences inoubliables à travers le monde.
+						<p className="text-sm text-muted-foreground leading-relaxed mb-4 max-w-lg">
+							Croisières, aventures et découvertes aux quatre coins du monde. Parce que les plus beaux voyages se mesurent en connexions humaines. Explorez,
+							rêvez… laissez-vous porter vers de nouveaux horizons.
 						</p>
 						<div className="flex gap-4 mt-6">
-							{[Instagram, Facebook, Mail].map((Icon, i) => (
-								<Button
-									key={i}
-									variant="outline"
-									size="icon"
-									className="border-white/20 hover:border-gold text-gold hover:bg-gold hover:text-charcoal"
-								>
-									<Icon className="size-[18px]" />
-								</Button>
-							))}
+							{socialLinks.map((social) => {
+								const Icon = iconMap[social.icon];
+								return (
+									<Button
+										key={social.label}
+										asChild
+										variant="outline"
+										size="icon"
+										className="border-white/20 hover:border-gold text-gold hover:bg-gold hover:text-charcoal"
+									>
+										<a
+											href={social.href}
+											target="_blank"
+											rel="noopener noreferrer"
+											aria-label={social.label}
+										>
+											{Icon && <Icon className="size-[20px]" />}
+										</a>
+									</Button>
+								);
+							})}
 						</div>
-					</div>
-
-					{/* Destinations */}
-					<div>
-						<h4 className="text-sm tracking-[0.2em] uppercase mb-6 font-semibold">Destinations</h4>
-						<ul className="space-y-3 text-sm text-muted-foreground">
-							{["Europe", "Asie", "Afrique", "Amériques", "Océanie"].map((item) => (
-								<li key={item}>
-									<a
-										href="#"
-										className="hover:text-gold transition-colors"
-									>
-										{item}
-									</a>
-								</li>
-							))}
-						</ul>
-					</div>
-
-					{/* Services */}
-					<div>
-						<h4 className="text-sm tracking-[0.2em] uppercase mb-6 font-semibold">Services</h4>
-						<ul className="space-y-3 text-sm text-muted-foreground">
-							{["Voyages Sur Mesure", "Lunes de Miel", "Voyages en Groupe", "Conciergerie", "Vols Privés"].map((item) => (
-								<li key={item}>
-									<a
-										href="#"
-										className="hover:text-gold transition-colors"
-									>
-										{item}
-									</a>
-								</li>
-							))}
-						</ul>
 					</div>
 
 					{/* Contact */}
 					<div>
-						<h4 className="text-sm tracking-[0.2em] uppercase mb-6 font-semibold">Contact</h4>
+						<h4 className="text-sm tracking-[0.2em] uppercase mb-2 font-semibold">Contact</h4>
 						<ul className="space-y-3 text-sm text-muted-foreground">
 							<li className="flex items-start gap-2">
 								<MapPin className="size-4 mt-1 shrink-0" />

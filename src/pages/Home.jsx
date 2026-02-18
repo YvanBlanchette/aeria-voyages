@@ -17,8 +17,8 @@ const HomePage = () => {
 				{/* <IntroSection /> */}
 				<CroisieresSection />
 				<CircuitsSection />
-				<QuoteSection />
-				<TestimonialsSection />
+				{/* <QuoteSection /> */}
+				{/* <TestimonialsSection /> */}
 				<CtaSection />
 			</main>
 			<Footer />

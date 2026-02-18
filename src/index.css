@@ -1,7 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Raleway:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Raleway:wght@300;400;500;600;700&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -146,6 +146,7 @@
 body {
 	font-family: var(--font-sans);
 	overflow-x: hidden;
+	width: 100%;
 }
 
 .font-serif {

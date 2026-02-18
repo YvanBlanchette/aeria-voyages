@@ -89,7 +89,7 @@ export default function Modal({ c, onClose }) {
 						</div>
 
 						<div className="p-5 space-y-4 max-h-[65vh] overflow-y-auto">
-							<div className="flex justify-between gap-4">
+							<div className="flex flex-col sm:flex-row justify-between gap-4">
 								<div className="flex-1">
 									<p className="text-[10px] text-stone-400 tracking-[0.15em] uppercase mb-1.5">Détails de la Croisière</p>
 									<div className=" flex flex-col ml-2 gap-0.5">
@@ -121,7 +121,7 @@ export default function Modal({ c, onClose }) {
 								</div>
 
 								{/* BOUTONS CTA */}
-								<div className="flex flex-col gap-2">
+								<div className="flex flex-col sm:flex-row gap-2">
 									{/* MESSENGER */}
 									<a
 										href={msgUrl}

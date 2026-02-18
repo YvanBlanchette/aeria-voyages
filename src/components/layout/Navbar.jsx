@@ -41,12 +41,22 @@ const Navbar = () => {
 						<a
 							key={link.href}
 							href={link.href}
+							target={link.target}
+							rel={link.rel}
 							className="nav-link text-sm tracking-[0.15em] pt-2 uppercase font-medium hover:text-gold"
 						>
 							{link.label}
 						</a>
 					))}
-					<Button className="bg-charcoal hover:bg-gold text-white text-sm tracking-[0.15em] uppercase font-medium">Planifier un Voyage</Button>
+					<Button className="cursor-pointer bg-charcoal hover:bg-gold text-white text-sm tracking-[0.15em] uppercase font-medium">
+						<a
+							href="https://go.aeriavoyages.com/questionnaire-consultation"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Planifier un Voyage
+						</a>
+					</Button>
 				</div>
 
 				{/* Burger */}
@@ -66,13 +76,23 @@ const Navbar = () => {
 							<a
 								key={link.href}
 								href={link.href}
+								target={link.target}
+								rel={link.rel}
 								onClick={() => setMenuOpen(false)}
 								className="font-serif text-3xl hover:text-gold transition-colors"
 							>
 								{link.label}
 							</a>
 						))}
-						<Button className="bg-charcoal text-white text-sm tracking-[0.15em] uppercase font-medium mt-6">Planifier un Voyage</Button>
+						<Button className="bg-charcoal text-white text-sm tracking-[0.15em] uppercase font-medium mt-6">
+							<a
+								href="https://go.aeriavoyages.com/questionnaire-consultation"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Planifier un Voyage
+							</a>
+						</Button>
 					</div>
 				</div>
 			)}
