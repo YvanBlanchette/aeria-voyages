@@ -156,24 +156,9 @@ export function useCroisieres() {
 	const [chargement, setChargement] = useState(true);
 
 	useEffect(() => {
-		const sources = [
-			{ url: "/data/croisieres-sud.json", dest: "caraibes" },
-			{ url: "/data/croisieres-europe.json", dest: "europe" },
-			{ url: "/data/croisieres-alaska.json", dest: "alaska" },
-			{ url: "/data/croisieres-exotiques.json", dest: "exotiques" },
-		];
-
-		Promise.all(
-			sources.map((s) =>
-				fetch(s.url)
-					.then((r) => r.json())
-					.then((data) => data.map((c) => ({ ...c, _dest: s.dest }))),
-			),
-		)
-			.then((resultats) => {
-				const tout = resultats.flat().filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"]));
-				setToutes(tout);
-			})
+		fetch("/api/croisieres")
+			.then((r) => r.json())
+			.then((data) => setToutes(data.filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"]))))
 			.finally(() => setChargement(false));
 	}, []);
 
@@ -192,6 +177,8 @@ export function useCroisieres() {
 		OPTS_MOIS: [...new Set(toutes.map((c) => getMois(c["Date Départ"])).filter(Boolean))]
 			.sort((a, b) => a - b)
 			.map((m) => ({ value: String(m), label: MOIS_LONG[m].charAt(0).toUpperCase() + MOIS_LONG[m].slice(1) })),
-		OPTS_ANNEES: [...new Set(toutes.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))].sort().map((a) => ({ value: a, label: a })),
+		OPTS_ANNEES: [...new Set(toutes.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))]
+			.sort()
+			.map((a) => ({ value: a, label: a })),
 	};
 }

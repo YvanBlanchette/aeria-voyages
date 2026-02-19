@@ -76,10 +76,13 @@ def sauvegarder_exoticca_db(liste_circuits):
             ))
 
         conn.commit()
+        conn.close()
         print(f"💾 {len(liste_circuits)} circuits enregistrés dans SQLite.")
 
-        # Export JSON pour React — format compatible avec CircuitsSection.jsx
+        # Nouvelle connexion pour l'export JSON
+        conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
         cursor.execute("""
             SELECT 
                 id, region, destination, titre, jours,

@@ -223,10 +223,17 @@ def sauvegarder_db(tous_les_resultats):
         ))
 
     conn.commit()
+    conn.close()
     print(f"💾 {len(tous_les_resultats)} croisières enregistrées dans SQLite.")
+
+    # Nouvelle connexion pour l'export JSON
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
 
     # Export JSON par section pour React
     os.makedirs(JSON_DIR, exist_ok=True)
+
     sections_map = {
         "sud":       "croisieres-sud",
         "europe":    "croisieres-europe",

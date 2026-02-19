@@ -11,7 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 // ── Connexion DB ──────────────────────────────────────────────────────────────
-const db = new Database(DB_PATH, { readonly: true });
+const db = new Database(DB_PATH);
+db.pragma('journal_mode = WAL');
+db.pragma('busy_timeout = 5000');
 
 // ── Utilitaires ───────────────────────────────────────────────────────────────
 function parseJSON(val) {
