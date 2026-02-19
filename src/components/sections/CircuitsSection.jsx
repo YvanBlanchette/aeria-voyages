@@ -22,10 +22,10 @@ const CircuitsSection = () => {
 	const [showAll, setShowAll] = useState(false);
 
 	useEffect(() => {
-		fetch("/data/exoticca.json")
-			.then((r) => r.json())
-			.then((data) => setCircuitsData(data))
-			.finally(() => setChargement(false));
+		fetch("/api/circuits/exoticca")
+    .then(r => r.json())
+    .then(data => setCircuitsData(data))
+    .finally(() => setChargement(false));
 	}, []);
 
 	const regions = ["all", ...new Set(circuitsData.map((c) => c.region))];
