@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { X, Anchor, ChevronDown } from "lucide-react";
+import { X, Anchor, ChevronDown, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
@@ -7,24 +7,12 @@ import MultiSelect from "./MultiSelect";
 import CarteCroisiere from "./CarteCroisiere";
 import Modal from "./Modal";
 
-import {
-	GOLD,
-	ITEMS_PAR_PAGE,
-	DUREES,
-	TRI_OPTIONS,
-	COMPARATEURS,
-	TOUTES,
-	getMois,
-	getAnnee,
-	OPTS_DEST,
-	OPTS_COMPAGNIES,
-	OPTS_DUREES,
-	OPTS_MOIS,
-	OPTS_ANNEES,
-} from "./constants";
+import { GOLD, ITEMS_PAR_PAGE, DUREES, TRI_OPTIONS, COMPARATEURS, getMois, getAnnee, useCroisieres } from "./constants";
 import { Separator } from "@/components/ui/separator";
 
 export default function CroisieresSection() {
+	const { toutes: TOUTES, chargement, OPTS_DEST, OPTS_COMPAGNIES, OPTS_DUREES, OPTS_MOIS, OPTS_ANNEES } = useCroisieres();
+
 	const [modalC, setModalC] = useState(null);
 	const [page, setPage] = useState(1);
 	const [fDests, setFDests] = useState([]);
@@ -59,7 +47,7 @@ export default function CroisieresSection() {
 				}),
 			);
 		return [...r].sort(COMPARATEURS[tri] ?? COMPARATEURS["date-asc"]);
-	}, [fDests, fComps, fDurees, fMois, fAnnees, tri]);
+	}, [TOUTES, fDests, fComps, fDurees, fMois, fAnnees, tri]);
 
 	const nbPages = Math.ceil(filtrees.length / ITEMS_PAR_PAGE);
 	const affichees = filtrees.slice((page - 1) * ITEMS_PAR_PAGE, page * ITEMS_PAR_PAGE);
@@ -136,7 +124,6 @@ export default function CroisieresSection() {
 						/>
 
 						<div className="ml-auto flex flex-col items-center gap-4">
-							{/* Tri */}
 							<div className="relative">
 								<select
 									value={tri}
@@ -144,7 +131,7 @@ export default function CroisieresSection() {
 										setTri(e.target.value);
 										setPage(1);
 									}}
-									className="appearance-none text-sm pl-3  w-[120px] pr-8 py-2.5 border border-stone-200 bg-white text-stone-700 hover:border-stone-300 focus:outline-none focus:border-[#B8935C] transition-colors duration-200 cursor-pointer"
+									className="appearance-none text-sm pl-3 w-[120px] pr-8 py-2.5 border border-stone-200 bg-white text-stone-700 hover:border-stone-300 focus:outline-none focus:border-[#B8935C] transition-colors duration-200 cursor-pointer"
 								>
 									{TRI_OPTIONS.map((o) => (
 										<option
@@ -170,8 +157,14 @@ export default function CroisieresSection() {
 						</div>
 					</div>
 				</div>
-				{/* Grille ou état vide */}
-				{affichees.length === 0 ? (
+
+				{/* Contenu */}
+				{chargement ? (
+					<div className="text-center py-24 flex flex-col items-center gap-3">
+						<Loader2 className="size-8 animate-spin text-stone-300" />
+						<p className="text-stone-400 text-sm">Chargement des croisières...</p>
+					</div>
+				) : affichees.length === 0 ? (
 					<div className="text-center py-24">
 						<Anchor className="size-12 mx-auto mb-4 text-stone-200" />
 						<p className="text-stone-400 font-medium text-lg">Aucune croisière pour ces filtres.</p>
@@ -223,7 +216,6 @@ export default function CroisieresSection() {
 				)}
 			</div>
 
-			{/* Modal */}
 			{modalC && (
 				<Modal
 					c={modalC}

@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 // ── Imports logos ─────────────────────────────────────────────────────────────
 import logoRoyal from "/logos/royal.png";
 import logoPrincess from "/logos/princess.png";
@@ -8,12 +10,6 @@ import logoHAL from "/logos/hal.png";
 import logoCunard from "/logos/cunard.png";
 import logoSeabourn from "/logos/seabourn.png";
 import logoExplora from "/logos/explora.png";
-
-// ── Imports données ────────────────────────────────────────────────────────────
-import CroisieresSudData from "@/data/croisieres-sud.json";
-import CroisieresEuropeData from "@/data/croisieres-europe.json";
-import CroisieresAlaskaData from "@/data/croisieres-alaska.json";
-import CroisieresExotiquesData from "@/data/croisieres-exotiques.json";
 
 import { PORTS_DESTINATIONS_SOLEIL, PORTS_EUROPE, PORTS_ALASKA, PORTS_CANADA, PORTS_EXOTIQUES, PORTS_AMERIQUE_SUD } from "@/data/ports";
 
@@ -87,44 +83,25 @@ export function fmtPeriode(dep, ret) {
 	return `${jD} ${MOIS_LONG[mD]} ${aD} au ${jR} ${MOIS_LONG[mR]} ${aR}`;
 }
 
-/**
- * Résout un code de port en nom lisible.
- * Ex: "KTN" → "Ketchikan, AK"
- *     "Seattle, WA" → "Seattle, WA" (déjà un nom, passthrough)
- *     "CYXX" → "CYXX" (inconnu, retourné tel quel)
- */
 export function resoudrePort(code) {
 	if (!code) return null;
 	const s = code.trim();
-	// Déjà un nom lisible (contient espace ou virgule)
 	if (s.includes(" ") || s.includes(",")) return s;
-	// Résolution via le dictionnaire
 	const nom = PORT_NOMS[s];
 	if (nom) return nom;
-	// Code inconnu — log en dev, affiché tel quel en prod
 	if (import.meta.env.DEV) {
 		console.warn(`[ports] Code inconnu : "${s}" — ajoutez-le dans ports.js`);
 	}
 	return s;
 }
 
-/**
- * Extrait et résout la liste des ports d'une croisière.
- * Priorité : champ "Ports" du JSON (codes bruts) → fallback URL itinéraire.
- */
 export function getPorts(c) {
-	// Champ Ports présent : tableau de codes à résoudre
 	if (Array.isArray(c["Ports"]) && c["Ports"].length > 0) {
 		return c["Ports"].map(resoudrePort).filter(Boolean);
 	}
-	// Fallback : décodage depuis l'URL de la carte (ancien format)
 	return decoderPortsUrl(c["Image Itinéraire"]);
 }
 
-/**
- * Fallback — extrait les codes depuis l'URL et les résout.
- * Ex: .../itin/SEA-KTN-YYJ-SEA.webp → ['Seattle, WA', 'Ketchikan, AK', ...]
- */
 function decoderPortsUrl(urlCarte) {
 	const match = urlCarte?.match(/\/itin\/([^.]+)\.webp/);
 	if (!match) return [];
@@ -137,7 +114,6 @@ function decoderPortsUrl(urlCarte) {
 
 export function buildMessengerUrl(c) {
 	const prix = getPrixMin(c);
-	const ports = getPorts(c);
 	const txt =
 		`Bonjour Yvan ! Je suis intéressé(e) par cette croisière :\n\n` +
 		`🚢 ${c["Itinéraire"]} — ${c["Navire"]} (${c["Croisiériste"]})\n` +
@@ -174,33 +150,48 @@ export const COMPARATEURS = {
 	"duree-desc": (a, b) => b["Nuits"] - a["Nuits"],
 };
 
-// ── Données pré-calculées (une seule fois à l'import) ─────────────────────────
-export const TOUTES = [
-	...CroisieresSudData.map((c) => ({ ...c, _dest: "caraibes" })),
-	...CroisieresEuropeData.map((c) => ({ ...c, _dest: "europe" })),
-	...CroisieresAlaskaData.map((c) => ({ ...c, _dest: "alaska" })),
-	...CroisieresExotiquesData.map((c) => ({ ...c, _dest: "exotiques" })),
-].filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"]));
+// ── Hook useCroisieres ────────────────────────────────────────────────────────
+export function useCroisieres() {
+	const [toutes, setToutes] = useState([]);
+	const [chargement, setChargement] = useState(true);
 
-const DESTS_ACTIVES = new Set(TOUTES.map((c) => c._dest));
+	useEffect(() => {
+		const sources = [
+			{ url: "/data/croisieres-sud.json", dest: "caraibes" },
+			{ url: "/data/croisieres-europe.json", dest: "europe" },
+			{ url: "/data/croisieres-alaska.json", dest: "alaska" },
+			{ url: "/data/croisieres-exotiques.json", dest: "exotiques" },
+		];
 
-export const OPTS_DEST = DESTINATIONS_ORDRE.map((d) => ({
-	value: d,
-	label: DESTINATION_LABELS[d],
-	disabled: !DESTS_ACTIVES.has(d),
-}));
+		Promise.all(
+			sources.map((s) =>
+				fetch(s.url)
+					.then((r) => r.json())
+					.then((data) => data.map((c) => ({ ...c, _dest: s.dest }))),
+			),
+		)
+			.then((resultats) => {
+				const tout = resultats.flat().filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"]));
+				setToutes(tout);
+			})
+			.finally(() => setChargement(false));
+	}, []);
 
-export const OPTS_COMPAGNIES = [...new Set(TOUTES.map((c) => c["Croisiériste"]))].sort().map((c) => ({ value: c, label: c }));
+	const DESTS_ACTIVES = new Set(toutes.map((c) => c._dest));
 
-export const OPTS_DUREES = DUREES.map((d, i) => ({ value: String(i), label: d.label }));
-
-const MOIS_DISPOS = [...new Set(TOUTES.map((c) => getMois(c["Date Départ"])).filter(Boolean))].sort((a, b) => a - b);
-
-export const OPTS_MOIS = MOIS_DISPOS.map((m) => ({
-	value: String(m),
-	label: MOIS_LONG[m].charAt(0).toUpperCase() + MOIS_LONG[m].slice(1),
-}));
-
-const ANNEES_DISPOS = [...new Set(TOUTES.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))].sort();
-
-export const OPTS_ANNEES = ANNEES_DISPOS.map((a) => ({ value: a, label: a }));
+	return {
+		toutes,
+		chargement,
+		OPTS_DEST: DESTINATIONS_ORDRE.map((d) => ({
+			value: d,
+			label: DESTINATION_LABELS[d],
+			disabled: !DESTS_ACTIVES.has(d),
+		})),
+		OPTS_COMPAGNIES: [...new Set(toutes.map((c) => c["Croisiériste"]))].sort().map((c) => ({ value: c, label: c })),
+		OPTS_DUREES: DUREES.map((d, i) => ({ value: String(i), label: d.label })),
+		OPTS_MOIS: [...new Set(toutes.map((c) => getMois(c["Date Départ"])).filter(Boolean))]
+			.sort((a, b) => a - b)
+			.map((m) => ({ value: String(m), label: MOIS_LONG[m].charAt(0).toUpperCase() + MOIS_LONG[m].slice(1) })),
+		OPTS_ANNEES: [...new Set(toutes.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))].sort().map((a) => ({ value: a, label: a })),
+	};
+}
