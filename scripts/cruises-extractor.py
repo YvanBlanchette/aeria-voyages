@@ -3,35 +3,29 @@ import csv
 import re
 import os
 import time
+import sqlite3
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 
 # ─────────────────────────────────────────
-#  CONFIGURATION
+#  CONFIGURATION DES CHEMINS
 # ─────────────────────────────────────────
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
+DB_PATH     = os.path.join(BASE_DIR, "..", "db", "croisieres.db")
+JSON_DIR    = "/var/www/aeria-voyages/dist/data"
+
 SECTIONS = {
-    "croisieres-sud":       "https://www.voyagesconstellation.com/croisieres-sud",
-    "croisieres-europe":    "https://www.voyagesconstellation.com/croisieres-europe",
-    "croisieres-alaska":    "https://www.voyagesconstellation.com/croisieres-alaska",
-    "croisieres-exotiques": "https://www.voyagesconstellation.com/croisieres-exotiques",
+    "sud":       "https://www.voyagesconstellation.com/croisieres-sud",
+    "europe":    "https://www.voyagesconstellation.com/croisieres-europe",
+    "alaska":    "https://www.voyagesconstellation.com/croisieres-alaska",
+    "exotiques": "https://www.voyagesconstellation.com/croisieres-exotiques",
 }
 
 BASE_URL    = "https://www.voyagesconstellation.com"
 BASE_IMG    = "https://www.voyagesconstellation.com"
 DELAI_RENDU = 5
-
-CHAMPS_CSV = [
-    'Croisiériste', 'Navire', 'Date Départ', 'Date Retour', 'Nuits',
-    'Itinéraire', 'Port Départ', 'Ports',
-    'Prix Int.', 'Prix Ext.', 'Prix Balcon',
-    'Prix Vol MTL Int.', 'Prix Vol MTL Ext.', 'Prix Vol MTL Balcon',
-    'Boissons', 'Pourboires', 'WiFi',
-    'Image Itinéraire', 'Image Navire',
-    'Lien'
-]
 
 MOIS_MAP = {
     'janv': '01', 'févr': '02', 'mars': '03', 'avr': '04',
@@ -55,28 +49,19 @@ RE_PRV    = re.compile(r'id="prv_(\d+)"[^>]*src="([^"]+)"')
 RE_ITIN   = re.compile(r'<div class="name">([^<]+)')
 RE_NAVIRE = re.compile(r'<div class="subname">([^<]+)')
 RE_DATE   = re.compile(r'<b>([^<]+)</b>')
-RE_PORT = re.compile(r'(?:D[ée]part)\s+de\s+([^<\n]+)', re.I)
+RE_PORT   = re.compile(r'(?:D[ée]part)\s+de\s+([^<\n]+)', re.I)
 
 # ─────────────────────────────────────────
 #  EXTRACTION DES CODES DE PORTS
 # ─────────────────────────────────────────
 def extraire_codes_ports(url_carte):
-    """
-    Extrait les codes de ports depuis l'URL de la carte itinéraire.
-    Retourne une liste de codes bruts normalisés en MAJUSCULES.
-
-    Ex: .../itin/SEA-KTN-CYPR-CYCD-YYJ-SEA.webp
-        → ['SEA', 'KTN', 'CYPR', 'CYCD', 'YYJ', 'SEA']
-    """
     match = re.search(r'/itin/([^.]+)\.webp', url_carte)
     if not match:
         return []
-
     codes = []
     for segment in match.group(1).split('-'):
         if segment and re.match(r'^[A-Z]', segment):
             codes.append(segment.upper())
-
     return codes
 
 # ─────────────────────────────────────────
@@ -90,13 +75,6 @@ def convertir_iso(jour, mois_texte, annee):
     return f"{annee}-01-{int(jour):02d}"
 
 def extraire_dates(texte_brut):
-    """
-    Gère correctement les périodes qui traversent 2 années.
-    Ex:
-      - "27 déc au 2 janv 2027" -> départ 2026-12-27, retour 2027-01-02
-      - "27 au 30 déc 2026"     -> départ 2026-12-27, retour 2026-12-30
-      - "27 déc 2026 au 2 janv 2027" -> années explicites, on respecte
-    """
     d_dep, d_ret, nuits = "N/A", "N/A", 0
 
     def mois_num(mois_texte):
@@ -109,7 +87,6 @@ def extraire_dates(texte_brut):
     try:
         t = texte_brut.replace('\xa0', ' ').strip()
 
-        # Cas explicite: "27 déc 2026 au 2 janv 2027"
         m_two_years = re.search(
             r'(\d+)\s+([a-zéûà.]+)\s+(\d{4})\s+au\s+(\d+)\s+([a-zéûà.]+)\s+(\d{4})',
             t, re.I
@@ -117,55 +94,41 @@ def extraire_dates(texte_brut):
         if m_two_years:
             j1, m1, y1 = int(m_two_years.group(1)), m_two_years.group(2), int(m_two_years.group(3))
             j2, m2, y2 = int(m_two_years.group(4)), m_two_years.group(5), int(m_two_years.group(6))
-
             d_dep = convertir_iso(j1, m1, str(y1))
             d_ret = convertir_iso(j2, m2, str(y2))
-
             dep_dt = datetime.strptime(d_dep, "%Y-%m-%d")
             ret_dt = datetime.strptime(d_ret, "%Y-%m-%d")
             nuits = (ret_dt - dep_dt).days
             return d_dep, d_ret, nuits
 
-        # année à la fin (souvent l'année de RETOUR)
         m_year_end = re.search(r'(\d{4})\s*$', t)
         if not m_year_end:
             return d_dep, d_ret, nuits
         year_end = int(m_year_end.group(1))
 
-        # 1) "27 déc au 2 janv 2027"
         m_diff = re.search(r'(\d+)\s+([a-zéûà.]+)\s+au\s+(\d+)\s+([a-zéûà.]+)', t, re.I)
-
-        # 2) "27 au 30 déc 2026"
         m_meme = re.search(r'(\d+)\s+au\s+(\d+)\s+([a-zéûà.]+)', t, re.I)
 
         if m_diff:
             j1, m1 = int(m_diff.group(1)), m_diff.group(2)
             j2, m2 = int(m_diff.group(3)), m_diff.group(4)
-
             m1n = mois_num(m1)
             m2n = mois_num(m2)
-
             y_ret = year_end
             y_dep = year_end - 1 if m2n < m1n else year_end
-
             d_dep = convertir_iso(j1, m1, str(y_dep))
             d_ret = convertir_iso(j2, m2, str(y_ret))
-
         elif m_meme:
             j1, j2, m = int(m_meme.group(1)), int(m_meme.group(2)), m_meme.group(3)
             d_dep = convertir_iso(j1, m, str(year_end))
             d_ret = convertir_iso(j2, m, str(year_end))
 
-        # recalcul nuits si possible
         if d_dep != "N/A" and d_ret != "N/A":
             dep_dt = datetime.strptime(d_dep, "%Y-%m-%d")
             ret_dt = datetime.strptime(d_ret, "%Y-%m-%d")
-
-            # garde-fou: si malgré tout ret < dep, on assume que le retour est l'année suivante
             if ret_dt < dep_dt:
                 ret_dt = ret_dt.replace(year=ret_dt.year + 1)
                 d_ret = ret_dt.strftime("%Y-%m-%d")
-
             nuits = (ret_dt - dep_dt).days
 
     except Exception:
@@ -209,28 +172,110 @@ def normaliser_img(src):
         return re.sub(r'([a-z])//img', r'\1/img', src)
     return BASE_IMG + src
 
-def atomic_write(data, filename, is_json=True):
-    temp = filename + ".tmp"
+# ─────────────────────────────────────────
+#  SQLITE
+# ─────────────────────────────────────────
+def generer_lien_excursions(nom_navire, date_depart):
+    """Cherche l'ID SEG dans la DB et construit l'URL"""
     try:
-        if is_json:
-            with open(temp, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
-        else:
-            with open(temp, 'w', newline='', encoding='utf-16') as f:
-                writer = csv.DictWriter(
-                    f, fieldnames=CHAMPS_CSV,
-                    delimiter='\t', extrasaction='ignore'
-                )
-                writer.writeheader()
-                writer.writerows(data)
-
-        if os.path.exists(filename):
-            os.remove(filename)
-        os.rename(temp, filename)
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT ship_id, line_id, itineraries_json 
+            FROM seg_mapping 
+            WHERE LOWER(ship_name) = LOWER(?)
+        """, (nom_navire.strip(),))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            ship_id, line_id, itin_json = row
+            itins = json.loads(itin_json)
+            nights = itins.get(date_depart)
+            if nights:
+                return f"https://www.shoreexcursionsgroup.com/results/?line={line_id}&shipId={ship_id}&arrival={date_depart}&nights={nights}"
     except Exception as e:
-        if os.path.exists(temp):
-            os.remove(temp)
-        print(f"   ❌ Erreur écriture {filename}: {e}")
+        print(f"⚠️ Erreur mapping SEG: {e}")
+    return ""
+
+def sauvegarder_db(tous_les_resultats):
+    """Enregistre toutes les croisières dans SQLite et exporte les JSON par section"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM mes_croisieres")
+
+    for c in tous_les_resultats:
+        ports_str = ",".join(c.get('Ports', []))
+        lien_seg = generer_lien_excursions(c['Navire'], c['Date Départ'])
+        cursor.execute('''
+            INSERT INTO mes_croisieres (
+                croisieriste, navire, date_depart, date_retour, nuits,
+                itineraire, port_depart, ports, prix_int, prix_ext, prix_balcon,
+                prix_vol_int, prix_vol_ext, prix_vol_balcon, boissons, pourboires,
+                wifi, image_itin, image_navire, lien_constellation, lien_excursions, section
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            c['Croisiériste'], c['Navire'], c['Date Départ'], c['Date Retour'], c['Nuits'],
+            c['Itinéraire'], c['Port Départ'], ports_str,
+            c['Prix Int.'], c['Prix Ext.'], c['Prix Balcon'],
+            c['Prix Vol MTL Int.'], c['Prix Vol MTL Ext.'], c['Prix Vol MTL Balcon'],
+            c['Boissons'], c['Pourboires'], c['WiFi'],
+            c['Image Itinéraire'], c['Image Navire'], c['Lien'], lien_seg, c['section']
+        ))
+
+    conn.commit()
+    print(f"💾 {len(tous_les_resultats)} croisières enregistrées dans SQLite.")
+
+    # Export JSON par section pour React
+    os.makedirs(JSON_DIR, exist_ok=True)
+    sections_map = {
+        "sud":       "croisieres-sud",
+        "europe":    "croisieres-europe",
+        "alaska":    "croisieres-alaska",
+        "exotiques": "croisieres-exotiques",
+    }
+
+    conn.row_factory = sqlite3.Row
+    for section_key, fichier in sections_map.items():
+        cursor.execute(
+            "SELECT * FROM mes_croisieres WHERE section = ? ORDER BY date_depart ASC",
+            (section_key,)
+        )
+        rows = [dict(row) for row in cursor.fetchall()]
+
+        # Conversion ports string → liste pour React
+        for row in rows:
+            row['Ports'] = row['ports'].split(',') if row['ports'] else []
+            row['Croisiériste']     = row['croisieriste']
+            row['Navire']           = row['navire']
+            row['Date Départ']      = row['date_depart']
+            row['Date Retour']      = row['date_retour']
+            row['Nuits']            = row['nuits']
+            row['Itinéraire']       = row['itineraire']
+            row['Port Départ']      = row['port_depart']
+            row['Prix Int.']        = row['prix_int']
+            row['Prix Ext.']        = row['prix_ext']
+            row['Prix Balcon']      = row['prix_balcon']
+            row['Prix Vol MTL Int.']    = row['prix_vol_int']
+            row['Prix Vol MTL Ext.']    = row['prix_vol_ext']
+            row['Prix Vol MTL Balcon']  = row['prix_vol_balcon']
+            row['Boissons']         = row['boissons']
+            row['Pourboires']       = row['pourboires']
+            row['WiFi']             = row['wifi']
+            row['Image Itinéraire'] = row['image_itin']
+            row['Image Navire']     = row['image_navire']
+            row['Lien']             = row['lien_constellation']
+            row['_dest']            = 'caraibes' if section_key == 'sud' else section_key
+
+        json_path = os.path.join(JSON_DIR, f"{fichier}.json")
+        temp_path = json_path + ".tmp"
+        with open(temp_path, 'w', encoding='utf-8') as f:
+            json.dump(rows, f, indent=2, ensure_ascii=False)
+        if os.path.exists(json_path):
+            os.remove(json_path)
+        os.rename(temp_path, json_path)
+        print(f"   📄 {fichier}.json ({len(rows)} croisières)")
+
+    conn.close()
 
 # ─────────────────────────────────────────
 #  EXTRACTION HTML → DONNÉES
@@ -238,9 +283,9 @@ def atomic_write(data, filename, is_json=True):
 def extraire_html(html, nom_section):
     t0 = time.perf_counter()
 
-    blocs      = RE_BLOCS.findall(html)
-    prix_map   = {(m.group(1), m.group(2), m.group(3)): int(m.group(4)) for m in RE_PRIX.finditer(html)}
-    incl_map   = {}
+    blocs    = RE_BLOCS.findall(html)
+    prix_map = {(m.group(1), m.group(2), m.group(3)): int(m.group(4)) for m in RE_PRIX.finditer(html)}
+    incl_map = {}
     for m in RE_INCL.finditer(html):
         n = m.group(3)
         if n not in incl_map:
@@ -263,7 +308,6 @@ def extraire_html(html, nom_section):
             date_txt = date_b.group(1).strip() if date_b else ""
             d_dep, d_ret, nuits = extraire_dates(date_txt)
 
-            # Validation dates (debug utile)
             if d_dep != "N/A" and d_ret != "N/A":
                 if not re.match(r"^\d{4}-\d{2}-\d{2}$", d_dep) or not re.match(r"^\d{4}-\d{2}-\d{2}$", d_ret):
                     print(f"⚠️ Date invalide: {nom_navire} | brut: {date_txt} | dep={d_dep} ret={d_ret}")
@@ -289,7 +333,7 @@ def extraire_html(html, nom_section):
                 'Date Retour':         d_ret,
                 'Nuits':               nuits,
                 'Itinéraire':          itin.group(1).strip() if itin else "N/A",
-                'Port Départ':         port.group(1).strip() if port else "N/A",
+                'Port Départ':         port_depart,
                 'Ports':               codes,
                 'Prix Int.':           p_int,
                 'Prix Ext.':           p_ext,
@@ -303,6 +347,7 @@ def extraire_html(html, nom_section):
                 'Image Itinéraire':    normaliser_img(img_itin.get(num, '')),
                 'Image Navire':        normaliser_img(img_navire.get(num, '')),
                 'Lien':                BASE_URL + href,
+                'section':             nom_section,
             })
         except Exception:
             pass
@@ -324,13 +369,16 @@ def lancer_robot():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
 
     driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
+        service=Service('/usr/bin/chromedriver'),
         options=chrome_options
     )
 
-    total_global = 0
+    tous_les_resultats = []
     t_global = time.perf_counter()
 
     try:
@@ -345,16 +393,13 @@ def lancer_robot():
             print(f"   🌐 Chargé en {time.perf_counter()-t0:.1f}s")
 
             resultats = extraire_html(html, nom)
-            total_global += len(resultats)
-
-            atomic_write(resultats, f'{nom}.json', is_json=True)
-            atomic_write(resultats, f'{nom}.csv', is_json=False)
-            print(f"   💾 {nom}.json · {nom}.csv\n")
+            tous_les_resultats.extend(resultats)
 
     finally:
         driver.quit()
 
-    print(f"🏁 Terminé — {total_global} croisières au total en {time.perf_counter()-t_global:.1f}s")
+    sauvegarder_db(tous_les_resultats)
+    print(f"\n🏁 Terminé — {len(tous_les_resultats)} croisières au total en {time.perf_counter()-t_global:.1f}s")
 
 if __name__ == "__main__":
     lancer_robot()
