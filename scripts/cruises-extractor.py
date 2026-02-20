@@ -4,7 +4,9 @@ import re
 import os
 import time
 import sqlite3
+import random
 from datetime import datetime
+from difflib import get_close_matches
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -34,6 +36,9 @@ MOIS_MAP = {
 }
 
 INCL_LABEL = {'yes': 'Inclus', 'free': 'Gratuit', 'no': 'Non inclus'}
+
+SEG_BASE      = "https://www.shoreexcursionsgroup.com/results/"
+SEG_AFFILIATE = "source=portal&id=1771540&data=yvanblanchette%40aeriavoyages.com"
 
 # ─────────────────────────────────────────
 #  REGEX COMPILÉES
@@ -173,45 +178,105 @@ def normaliser_img(src):
     return BASE_IMG + src
 
 # ─────────────────────────────────────────
+#  MAPPING SEG — chargé une seule fois
+# ─────────────────────────────────────────
+def charger_mapping_seg():
+    """
+    Charge le mapping SEG complet en mémoire.
+    Retourne deux dicts lowercase pour des lookups O(1).
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    # Corrections de noms manuelles
+    corrections = {}
+    try:
+        for row in cursor.execute(
+            "SELECT ship_name_constellation, ship_name_seg FROM seg_name_corrections"
+        ):
+            corrections[row[0].lower()] = row[1]
+    except Exception:
+        print("  ⚠️  Table seg_name_corrections introuvable — corrections ignorées.")
+
+    # Mapping principal ship_name → ship_id / line_id
+    mapping = {}
+    try:
+        for row in cursor.execute(
+            "SELECT ship_name, ship_id, line_id FROM seg_mapping"
+        ):
+            mapping[row[0].lower()] = {"ship_id": row[1], "line_id": row[2]}
+    except Exception as e:
+        print(f"  ❌  Impossible de charger seg_mapping : {e}")
+
+    conn.close()
+    print(f"✅  Mapping SEG chargé : {len(mapping)} navires, {len(corrections)} corrections.")
+    return corrections, mapping
+
+
+def generer_lien_seg(nom_navire, date_depart, nuits, corrections, mapping):
+    """
+    Génère le lien affilié SEG.
+    Priorité : match exact → correction manuelle → matching flou (cutoff 0.85).
+    """
+    nom            = nom_navire.strip()
+    nom_lower      = nom.lower()
+
+    # 1. Appliquer correction manuelle si elle existe
+    seg_name_lower = corrections.get(nom_lower, nom).lower()
+
+    # 2. Match exact dans le mapping
+    seg = mapping.get(seg_name_lower)
+
+    # 3. Fallback : matching flou
+    if not seg:
+        candidats = get_close_matches(seg_name_lower, mapping.keys(), n=1, cutoff=0.85)
+        if candidats:
+            seg = mapping[candidats[0]]
+            print(f"  🔍 Match flou : '{nom}' → '{candidats[0]}'")
+        else:
+            print(f"  ⚠️  Navire introuvable dans SEG : '{nom}'")
+            return ""
+
+    return (
+        f"{SEG_BASE}"
+        f"?line={seg['line_id']}&shipId={seg['ship_id']}"
+        f"&arrival={date_depart}&nights={nuits}"
+        f"&{SEG_AFFILIATE}"
+    )
+
+# ─────────────────────────────────────────
 #  SQLITE
 # ─────────────────────────────────────────
-def generer_lien_excursions(nom_navire, date_depart):
-    """Cherche l'ID SEG dans la DB et construit l'URL"""
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT ship_id, line_id, itineraries_json 
-            FROM seg_mapping 
-            WHERE LOWER(ship_name) = LOWER(?)
-        """, (nom_navire.strip(),))
-        row = cursor.fetchone()
-        conn.close()
-        if row:
-            ship_id, line_id, itin_json = row
-            itins = json.loads(itin_json)
-            nights = itins.get(date_depart)
-            if nights:
-                return f"https://www.shoreexcursionsgroup.com/results/?line={line_id}&shipId={ship_id}&arrival={date_depart}&nights={nights}"
-    except Exception as e:
-        print(f"⚠️ Erreur mapping SEG: {e}")
-    return ""
-
 def sauvegarder_db(tous_les_resultats):
-    """Enregistre toutes les croisières dans SQLite et exporte les JSON par section"""
+    """Enregistre toutes les croisières dans SQLite et exporte les JSON par section."""
+
+    # Chargement du mapping SEG une seule fois pour tout le run
+    corrections, mapping = charger_mapping_seg()
+
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM mes_croisieres")
 
+    liens_ok   = 0
+    liens_vide = 0
+
     for c in tous_les_resultats:
         ports_str = ",".join(c.get('Ports', []))
-        lien_seg = generer_lien_excursions(c['Navire'], c['Date Départ'])
+        lien_seg  = generer_lien_seg(
+            c['Navire'], c['Date Départ'], c['Nuits'],
+            corrections, mapping
+        )
+        if lien_seg:
+            liens_ok += 1
+        else:
+            liens_vide += 1
+
         cursor.execute('''
             INSERT INTO mes_croisieres (
                 croisieriste, navire, date_depart, date_retour, nuits,
                 itineraire, port_depart, ports, prix_int, prix_ext, prix_balcon,
                 prix_vol_int, prix_vol_ext, prix_vol_balcon, boissons, pourboires,
-                wifi, image_itin, image_navire, lien_constellation, lien_excursions, section
+                wifi, image_itin, image_navire, lien_constellation, lien_seg, section
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             c['Croisiériste'], c['Navire'], c['Date Départ'], c['Date Retour'], c['Nuits'],
@@ -224,14 +289,13 @@ def sauvegarder_db(tous_les_resultats):
 
     conn.commit()
     conn.close()
-    print(f"💾 {len(tous_les_resultats)} croisières enregistrées dans SQLite.")
+    print(f"💾 {len(tous_les_resultats)} croisières enregistrées — "
+          f"✅ {liens_ok} liens SEG générés, ⚠️  {liens_vide} sans lien.")
 
-    # Nouvelle connexion pour l'export JSON
+    # ── Export JSON par section pour React ────────────────────────────────────
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-
-    # Export JSON par section pour React
     os.makedirs(JSON_DIR, exist_ok=True)
 
     sections_map = {
@@ -241,7 +305,6 @@ def sauvegarder_db(tous_les_resultats):
         "exotiques": "croisieres-exotiques",
     }
 
-    conn.row_factory = sqlite3.Row
     for section_key, fichier in sections_map.items():
         cursor.execute(
             "SELECT * FROM mes_croisieres WHERE section = ? ORDER BY date_depart ASC",
@@ -249,29 +312,29 @@ def sauvegarder_db(tous_les_resultats):
         )
         rows = [dict(row) for row in cursor.fetchall()]
 
-        # Conversion ports string → liste pour React
         for row in rows:
-            row['Ports'] = row['ports'].split(',') if row['ports'] else []
-            row['Croisiériste']     = row['croisieriste']
-            row['Navire']           = row['navire']
-            row['Date Départ']      = row['date_depart']
-            row['Date Retour']      = row['date_retour']
-            row['Nuits']            = row['nuits']
-            row['Itinéraire']       = row['itineraire']
-            row['Port Départ']      = row['port_depart']
-            row['Prix Int.']        = row['prix_int']
-            row['Prix Ext.']        = row['prix_ext']
-            row['Prix Balcon']      = row['prix_balcon']
+            row['Ports']                = row['ports'].split(',') if row['ports'] else []
+            row['Croisiériste']         = row['croisieriste']
+            row['Navire']               = row['navire']
+            row['Date Départ']          = row['date_depart']
+            row['Date Retour']          = row['date_retour']
+            row['Nuits']                = row['nuits']
+            row['Itinéraire']           = row['itineraire']
+            row['Port Départ']          = row['port_depart']
+            row['Prix Int.']            = row['prix_int']
+            row['Prix Ext.']            = row['prix_ext']
+            row['Prix Balcon']          = row['prix_balcon']
             row['Prix Vol MTL Int.']    = row['prix_vol_int']
             row['Prix Vol MTL Ext.']    = row['prix_vol_ext']
             row['Prix Vol MTL Balcon']  = row['prix_vol_balcon']
-            row['Boissons']         = row['boissons']
-            row['Pourboires']       = row['pourboires']
-            row['WiFi']             = row['wifi']
-            row['Image Itinéraire'] = row['image_itin']
-            row['Image Navire']     = row['image_navire']
-            row['Lien']             = row['lien_constellation']
-            row['_dest']            = 'caraibes' if section_key == 'sud' else section_key
+            row['Boissons']             = row['boissons']
+            row['Pourboires']           = row['pourboires']
+            row['WiFi']                 = row['wifi']
+            row['Image Itinéraire']     = row['image_itin']
+            row['Image Navire']         = row['image_navire']
+            row['Lien']                 = row['lien_constellation']
+            row['LienSEG']              = row['lien_seg']
+            row['_dest']                = 'caraibes' if section_key == 'sud' else section_key
 
         json_path = os.path.join(JSON_DIR, f"{fichier}.json")
         temp_path = json_path + ".tmp"
@@ -311,8 +374,8 @@ def extraire_html(html, nom_section):
             date_b = RE_DATE.search(c)
             port   = RE_PORT.search(c)
 
-            nom_navire = navire.group(1).strip() if navire else "Inconnu"
-            date_txt = date_b.group(1).strip() if date_b else ""
+            nom_navire  = navire.group(1).strip() if navire else "Inconnu"
+            date_txt    = date_b.group(1).strip() if date_b else ""
             d_dep, d_ret, nuits = extraire_dates(date_txt)
 
             if d_dep != "N/A" and d_ret != "N/A":
@@ -327,8 +390,8 @@ def extraire_html(html, nom_section):
                 ignores += 1
                 continue
 
-            incl  = incl_map.get(num, {})
-            codes = extraire_codes_ports(img_itin.get(num, ''))
+            incl        = incl_map.get(num, {})
+            codes       = extraire_codes_ports(img_itin.get(num, ''))
             port_depart = port.group(1).strip() if port else "N/A"
             if port_depart == "N/A" and codes:
                 port_depart = codes[0]
@@ -372,12 +435,19 @@ def extraire_html(html, nom_section):
 def lancer_robot():
     print("🚢 Démarrage du robot Voyages Constellation...\n")
 
+    USER_AGENTS = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    ]
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument(f"--user-agent={random.choice(USER_AGENTS)}")  # ← ajout
     chrome_options.binary_location = "/usr/bin/chromium-browser"
 
     driver = webdriver.Chrome(
@@ -401,6 +471,7 @@ def lancer_robot():
 
             resultats = extraire_html(html, nom)
             tous_les_resultats.extend(resultats)
+            time.sleep(random.uniform(2, 6))
 
     finally:
         driver.quit()
