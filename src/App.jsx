@@ -10,7 +10,7 @@ function App() {
 				element={<Home />}
 			/>
 			<Route
-				path="/"
+				path="/submission"
 				element={<SubmissionRequest />}
 			/>
 		</Routes>
