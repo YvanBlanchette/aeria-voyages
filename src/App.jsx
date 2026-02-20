@@ -1,17 +1,17 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "@/pages/Home";
-import SubmissionRequest from "@/pages/SubmissionRequest";
+import HomePage from "@/pages/HomePage";
+import SubmissionRequestPage from "@/pages/SubmissionRequestPage";
 
 function App() {
 	return (
 		<Routes>
 			<Route
 				path="/"
-				element={<Home />}
+				element={<HomePage />}
 			/>
 			<Route
 				path="/submission"
-				element={<SubmissionRequest />}
+				element={<SubmissionRequestPage />}
 			/>
 		</Routes>
 	);

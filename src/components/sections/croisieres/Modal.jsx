@@ -4,9 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import emailjs from "@emailjs/browser";
 import { GOLD, getPorts, fmtPeriode, buildMessengerUrl, getPrixMin } from "./constants";
 
-const EMAILJS_SERVICE_ID = "service_u5ahpfh";
-const EMAILJS_TEMPLATE_ID = "template_ezt63ms";
-const EMAILJS_PUBLIC_KEY = "MXXt8SFDIKy19OMit";
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function Modal({ c, onClose }) {
 	const ports = getPorts(c);

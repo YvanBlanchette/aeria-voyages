@@ -16,7 +16,7 @@ const HeroSection = () => {
 				playsInline
 			/>
 
-			<div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60 z-10" />
+			<div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/20 z-10" />
 
 			<div className="absolute inset-0 z-20 flex items-center justify-center text-white px-6">
 				<div className="max-w-5xl text-center">

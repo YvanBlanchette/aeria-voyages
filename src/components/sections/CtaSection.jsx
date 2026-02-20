@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import emailjs from "@emailjs/browser";
 import icon from "@/assets/images/icon.svg";
 
-const EMAILJS_SERVICE_ID = "service_u5ahpfh";
-const EMAILJS_TEMPLATE_ID = "template_ezt63ms";
-const EMAILJS_PUBLIC_KEY = "MXXt8SFDIKy19OMit";
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 const CtaSection = () => {
 	const [nom, setNom] = useState("");
