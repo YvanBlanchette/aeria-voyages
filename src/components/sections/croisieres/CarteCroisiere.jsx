@@ -1,12 +1,14 @@
 import { memo } from "react";
 import { Ship, MapPin, Calendar, ShipIcon } from "lucide-react";
 import { GOLD, getPrixMin, fmtPeriode } from "./constants";
+import { Share2 } from "lucide-react";
+import { partagerCroisiere } from "./constants";
 
 const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 	const prix = getPrixMin(c);
 
 	return (
-		<button
+		<div
 			onClick={() => onClick(c)}
 			className="group text-left flex flex-col  overflow-hidden bg-white cursor-pointer w-full rounded-sm"
 			style={{
@@ -22,7 +24,7 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 				e.currentTarget.style.transform = "translateY(0)";
 			}}
 		>
-			{/* ── Image itinéraire (map) — propre, sans miniature ── */}
+			{/* ── Image itinéraire (map) ── */}
 			<div
 				className="relative overflow-hidden"
 				style={{ height: "250px" }}
@@ -33,7 +35,13 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 					className="w-full h-full object-cover"
 					loading="lazy"
 					onError={(e) => {
-						e.target.style.display = "none";
+						// Fallback vers URL Constellation originale
+						if (c["_itin_src"] && e.target.src !== c["_itin_src"]) {
+							e.target.src = c["_itin_src"];
+						} else {
+							e.target.parentElement.style.background = "#f0ede8";
+							e.target.style.display = "none";
+						}
 					}}
 				/>
 				<div
@@ -66,6 +74,21 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 				>
 					{c["Nuits"]} nuits
 				</div>
+
+				<button
+					onClick={(e) => {
+						e.stopPropagation();
+						partagerCroisiere(c);
+					}}
+					style={{
+						background: "rgba(0,0,0,0.35)",
+						backdropFilter: "blur(12px)",
+						border: "1px solid rgba(255,255,255,0.15)",
+					}}
+					className="cursor-pointer absolute bottom-4 right-2 z-10 size-8 rounded-full flex items-center justify-center hover:text-white ext-stone-300 transition-colors"
+				>
+					<Share2 className="size-4" />
+				</button>
 			</div>
 
 			{/* ── Corps ── */}
@@ -76,20 +99,15 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 						<h3 className="font-serif text-xl mb-1 leading-tight text-stone-900 group-hover:text-[#B8935C] transition-colors duration-300">
 							{c["Itinéraire"]}
 						</h3>
-						{/* Infos départ */}
 						<div className=" flex flex-col gap-0.5">
-							{/* NAVIRE */}
 							<p className="flex items-center gap-2 text-xs text-stone-500">
 								<ShipIcon className="size-3.5 shrink-0" />
 								{c["Navire"]}
 							</p>
-							{/* DATES */}
 							<p className="flex items-center gap-2 text-xs text-stone-500 ">
 								<Calendar className="size-3.5 shrink-0 mb-1 text-stone-400" />
 								<span>{fmtPeriode(c["Date Départ"], c["Date Retour"])}</span>
 							</p>
-
-							{/* PORT DE DÉPART */}
 							{c["Port Départ"] && c["Port Départ"] !== "N/A" && (
 								<p className="flex items-center gap-2 text-xs text-stone-500">
 									<MapPin className="size-3.5 mb-0.5 shrink-0" />
@@ -116,7 +134,12 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 								className="w-full h-full object-cover"
 								loading="lazy"
 								onError={(e) => {
-									e.target.parentElement.style.display = "none";
+									// Fallback vers URL Constellation originale
+									if (c["_navire_src"] && e.target.src !== c["_navire_src"]) {
+										e.target.src = c["_navire_src"];
+									} else {
+										e.target.parentElement.style.display = "none";
+									}
 								}}
 							/>
 						</div>
@@ -186,7 +209,7 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 					</div>
 				</div>
 			</div>
-		</button>
+		</div>
 	);
 });
 

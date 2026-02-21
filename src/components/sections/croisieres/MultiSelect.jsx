@@ -38,7 +38,7 @@ export default function MultiSelect({ placeholder, options, selected, onChange }
 			<button
 				onClick={() => setOpen((o) => !o)}
 				className={`cursor-pointer flex items-center gap-2 text-sm px-4 py-2.5 border transition-all duration-200 
-    w-full sm:min-w-[215px] justify-between bg-white ${open || hasSelection ? "border-[#B8935C] shadow-sm" : "border-stone-200 hover:border-stone-300"}`}
+    w-full sm:min-w-[180px] justify-between bg-white ${open || hasSelection ? "border-[#B8935C] shadow-sm" : "border-stone-200 hover:border-stone-300"}`}
 			>
 				<span className={hasSelection ? "text-stone-800 font-medium" : "text-stone-400"}>{label}</span>
 				<div className="flex items-center gap-1.5 shrink-0">

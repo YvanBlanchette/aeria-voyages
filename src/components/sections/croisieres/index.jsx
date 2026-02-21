@@ -17,26 +17,52 @@ export default function CroisieresSection() {
 	const [page, setPage] = useState(1);
 	const [fDests, setFDests] = useState([]);
 	const [fComps, setFComps] = useState([]);
+	const [fNavires, setFNavires] = useState([]);
 	const [fDurees, setFDurees] = useState([]);
 	const [fMois, setFMois] = useState([]);
 	const [fAnnees, setFAnnees] = useState([]);
 	const [tri, setTri] = useState("date-asc");
 
+	// Options navires dynamiques — filtrées selon les croisiéristes sélectionnés
+	const OPTS_NAVIRES = useMemo(() => {
+		const base = fComps.length > 0 ? TOUTES.filter((c) => fComps.includes(c["Croisiériste"])) : TOUTES;
+		return [...new Set(base.map((c) => c["Navire"]))]
+			.filter(Boolean)
+			.sort()
+			.map((n) => ({ value: n, label: n }));
+	}, [TOUTES, fComps]);
+
 	const reset = useCallback(() => {
 		setFDests([]);
 		setFComps([]);
+		setFNavires([]);
 		setFDurees([]);
 		setFMois([]);
 		setFAnnees([]);
 		setPage(1);
 	}, []);
 
-	const filtresActifs = fDests.length > 0 || fComps.length > 0 || fDurees.length > 0 || fMois.length > 0 || fAnnees.length > 0;
+	// Si on change de croisiériste, on reset les navires qui ne sont plus valides
+	const handleCompsChange = useCallback(
+		(val) => {
+			setFComps(val);
+			setFNavires((prev) => {
+				if (val.length === 0) return [];
+				const naviresValides = new Set(TOUTES.filter((c) => val.includes(c["Croisiériste"])).map((c) => c["Navire"]));
+				return prev.filter((n) => naviresValides.has(n));
+			});
+			setPage(1);
+		},
+		[TOUTES],
+	);
+
+	const filtresActifs = fDests.length > 0 || fComps.length > 0 || fNavires.length > 0 || fDurees.length > 0 || fMois.length > 0 || fAnnees.length > 0;
 
 	const filtrees = useMemo(() => {
 		let r = TOUTES;
 		if (fDests.length > 0) r = r.filter((c) => fDests.includes(c._dest));
 		if (fComps.length > 0) r = r.filter((c) => fComps.includes(c["Croisiériste"]));
+		if (fNavires.length > 0) r = r.filter((c) => fNavires.includes(c["Navire"]));
 		if (fMois.length > 0) r = r.filter((c) => fMois.includes(String(getMois(c["Date Départ"]))));
 		if (fAnnees.length > 0) r = r.filter((c) => fAnnees.includes(getAnnee(c["Date Départ"])));
 		if (fDurees.length > 0)
@@ -47,7 +73,7 @@ export default function CroisieresSection() {
 				}),
 			);
 		return [...r].sort(COMPARATEURS[tri] ?? COMPARATEURS["date-asc"]);
-	}, [TOUTES, fDests, fComps, fDurees, fMois, fAnnees, tri]);
+	}, [TOUTES, fDests, fComps, fNavires, fDurees, fMois, fAnnees, tri]);
 
 	const nbPages = Math.ceil(filtrees.length / ITEMS_PAR_PAGE);
 	const affichees = filtrees.slice((page - 1) * ITEMS_PAR_PAGE, page * ITEMS_PAR_PAGE);
@@ -90,8 +116,9 @@ export default function CroisieresSection() {
 				</div>
 
 				{/* Filtres */}
-				<div className="px-4 lg:px-0 mb-8">
-					<div className="flex flex-wrap gap-3 items-start">
+				<div className="px-4 lg:px-0 mb-8 space-y-3">
+					{/* Ligne 1 — 6 filtres côte à côte */}
+					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
 						<MultiSelect
 							placeholder="Destination"
 							options={OPTS_DEST}
@@ -99,13 +126,13 @@ export default function CroisieresSection() {
 							onChange={changer(setFDests)}
 						/>
 						<MultiSelect
-							placeholder="Durée du séjour"
+							placeholder="Durée"
 							options={OPTS_DUREES}
 							selected={fDurees}
 							onChange={changer(setFDurees)}
 						/>
 						<MultiSelect
-							placeholder="Mois de départ"
+							placeholder="Mois"
 							options={OPTS_MOIS}
 							selected={fMois}
 							onChange={changer(setFMois)}
@@ -120,40 +147,48 @@ export default function CroisieresSection() {
 							placeholder="Croisiériste"
 							options={OPTS_COMPAGNIES}
 							selected={fComps}
-							onChange={changer(setFComps)}
+							onChange={handleCompsChange}
 						/>
+						<div className={fComps.length === 0 ? "opacity-40 pointer-events-none" : ""}>
+							<MultiSelect
+								placeholder="Navire"
+								options={OPTS_NAVIRES}
+								selected={fNavires}
+								onChange={changer(setFNavires)}
+							/>
+						</div>
+					</div>
 
-						<div className="ml-auto flex flex-col items-center gap-4">
-							<div className="relative">
-								<select
-									value={tri}
-									onChange={(e) => {
-										setTri(e.target.value);
-										setPage(1);
-									}}
-									className="appearance-none text-sm pl-3 w-[120px] pr-8 py-2.5 border border-stone-200 bg-white text-stone-700 hover:border-stone-300 focus:outline-none focus:border-[#B8935C] transition-colors duration-200 cursor-pointer"
-								>
-									{TRI_OPTIONS.map((o) => (
-										<option
-											key={o.value}
-											value={o.value}
-										>
-											{o.label}
-										</option>
-									))}
-								</select>
-								<ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-stone-400 pointer-events-none" />
-							</div>
-
-							{filtresActifs && (
-								<button
-									onClick={reset}
-									className="cursor-pointer flex items-center gap-1.5 text-xs font-medium hover:opacity-70 transition-opacity"
-									style={{ color: GOLD }}
-								>
-									<X className="size-3" /> Réinitialiser
-								</button>
-							)}
+					{/* Ligne 2 — Réinitialiser (gauche) + Tri (droite) */}
+					<div className="flex items-center justify-end gap-4">
+						{filtresActifs && (
+							<button
+								onClick={reset}
+								className="cursor-pointer flex items-center gap-1.5 text-xs font-medium hover:opacity-70 transition-opacity"
+								style={{ color: GOLD }}
+							>
+								<X className="size-3" /> Réinitialiser
+							</button>
+						)}
+						<div className="relative">
+							<select
+								value={tri}
+								onChange={(e) => {
+									setTri(e.target.value);
+									setPage(1);
+								}}
+								className="appearance-none text-sm pl-3 w-[160px] pr-8 py-2.5 border border-stone-200 bg-white text-stone-700 hover:border-stone-300 focus:outline-none focus:border-[#B8935C] transition-colors duration-200 cursor-pointer"
+							>
+								{TRI_OPTIONS.map((o) => (
+									<option
+										key={o.value}
+										value={o.value}
+									>
+										{o.label}
+									</option>
+								))}
+							</select>
+							<ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-stone-400 pointer-events-none" />
 						</div>
 					</div>
 				</div>

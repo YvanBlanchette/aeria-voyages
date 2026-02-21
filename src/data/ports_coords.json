@@ -1,0 +1,899 @@
+{
+	"NPT": {
+		"lat": 41.48998,
+		"lng": -71.31377,
+		"nom": "Newport, Rhode Island, USA"
+	},
+	"MIA": {
+		"lat": 25.77416,
+		"lng": -80.1936,
+		"nom": "Miami, Florida, USA"
+	},
+	"FLL": {
+		"lat": 26.12231,
+		"lng": -80.14338,
+		"nom": "Fort Lauderdale, Florida, USA"
+	},
+	"TPA": {
+		"lat": 27.94499,
+		"lng": -82.45831,
+		"nom": "Tampa, Florida, USA"
+	},
+	"MCO": {
+		"lat": 28.41606,
+		"lng": -80.60783,
+		"nom": "Port Canaveral, Florida, USA"
+	},
+	"JAX": {
+		"lat": 30.32622,
+		"lng": -81.65792,
+		"nom": "Jacksonville, Florida, USA"
+	},
+	"EYW": {
+		"lat": 24.55483,
+		"lng": -81.80207,
+		"nom": "Key West, Florida, USA"
+	},
+	"CHS": {
+		"lat": 32.78844,
+		"lng": -79.93993,
+		"nom": "Charleston, South Carolina, USA"
+	},
+	"ORF": {
+		"lat": 36.84937,
+		"lng": -76.28995,
+		"nom": "Norfolk, Virginia, USA"
+	},
+	"BWI": {
+		"lat": 39.29088,
+		"lng": -76.61076,
+		"nom": "Baltimore, Maryland, USA"
+	},
+	"EWR": {
+		"lat": 40.66497,
+		"lng": -74.07246,
+		"nom": "Cape Liberty, Bayonne, New Jersey, USA"
+	},
+	"NYC": {
+		"lat": 40.71273,
+		"lng": -74.00602,
+		"nom": "New York City, New York, USA"
+	},
+	"BOS": {
+		"lat": 42.35883,
+		"lng": -71.05783,
+		"nom": "Boston, Massachusetts, USA"
+	},
+	"PHL": {
+		"lat": 39.95272,
+		"lng": -75.16353,
+		"nom": "Philadelphia, Pennsylvania, USA"
+	},
+	"MSY": {
+		"lat": 29.95614,
+		"lng": -90.07339,
+		"nom": "New Orleans, Louisiana, USA"
+	},
+	"GLS": {
+		"lat": 29.38723,
+		"lng": -94.99274,
+		"nom": "Galveston, Texas, USA"
+	},
+	"BHB": {
+		"lat": 44.38764,
+		"lng": -68.20434,
+		"nom": "Bar Harbor, Maine, USA"
+	},
+	"SAV": {
+		"lat": 32.07901,
+		"lng": -81.09213,
+		"nom": "Savannah, Georgia, USA"
+	},
+	"PWM": {
+		"lat": 43.65736,
+		"lng": -70.25866,
+		"nom": "Portland, Maine, USA"
+	},
+	"PBI": {
+		"lat": 26.71536,
+		"lng": -80.05329,
+		"nom": "West Palm Beach, Florida, USA"
+	},
+	"SAN": {
+		"lat": 32.71742,
+		"lng": -117.16277,
+		"nom": "San Diego, California, USA"
+	},
+	"LAX": {
+		"lat": 34.05369,
+		"lng": -118.24277,
+		"nom": "Los Angeles, California, USA"
+	},
+	"SFO": {
+		"lat": 37.78794,
+		"lng": -122.40752,
+		"nom": "San Francisco, California, USA"
+	},
+	"SEA": {
+		"lat": 47.60383,
+		"lng": -122.33006,
+		"nom": "Seattle, Washington, USA"
+	},
+	"LGB": {
+		"lat": 33.76902,
+		"lng": -118.1916,
+		"nom": "Long Beach, California, USA"
+	},
+	"YQB": {
+		"lat": 46.81374,
+		"lng": -71.20841,
+		"nom": "Quebec City, Quebec, Canada"
+	},
+	"YBG": {
+		"lat": 48.40596,
+		"lng": -71.06918,
+		"nom": "Saguenay, Quebec, Canada"
+	},
+	"CYUL": {
+		"lat": 45.50318,
+		"lng": -73.56981,
+		"nom": "Montreal, Quebec, Canada"
+	},
+	"YHZ": {
+		"lat": 44.64862,
+		"lng": -63.58595,
+		"nom": "Halifax, Nova Scotia, Canada"
+	},
+	"YQY": {
+		"lat": 46.13821,
+		"lng": -60.19419,
+		"nom": "Sydney, Nova Scotia, Canada"
+	},
+	"YVR": {
+		"lat": 49.26087,
+		"lng": -123.11395,
+		"nom": "Vancouver, British Columbia, Canada"
+	},
+	"YYJ": {
+		"lat": 48.42832,
+		"lng": -123.36495,
+		"nom": "Victoria, British Columbia, Canada"
+	},
+	"YPR": {
+		"lat": 54.31266,
+		"lng": -130.32549,
+		"nom": "Prince Rupert, British Columbia, Canada"
+	},
+	"YYG": {
+		"lat": 46.23542,
+		"lng": -63.12654,
+		"nom": "Charlottetown, Prince Edward Island, Canada"
+	},
+	"TAD": {
+		"lat": 48.14334,
+		"lng": -69.71746,
+		"nom": "Tadoussac, Quebec, Canada"
+	},
+	"JNU": {
+		"lat": 58.30196,
+		"lng": -134.41968,
+		"nom": "Juneau, Alaska, USA"
+	},
+	"KTN": {
+		"lat": 55.34307,
+		"lng": -131.64668,
+		"nom": "Ketchikan, Alaska, USA"
+	},
+	"SIT": {
+		"lat": 57.0525,
+		"lng": -135.33761,
+		"nom": "Sitka, Alaska, USA"
+	},
+	"SKA": {
+		"lat": 59.62264,
+		"lng": -135.40944,
+		"nom": "Skagway, Alaska, USA"
+	},
+	"ANC": {
+		"lat": 60.1014,
+		"lng": -149.44043,
+		"nom": "Seward, Alaska, USA"
+	},
+	"HNS": {
+		"lat": 59.08312,
+		"lng": -135.34306,
+		"nom": "Haines, Alaska, USA"
+	},
+	"WRG": {
+		"lat": 56.4706,
+		"lng": -132.38294,
+		"nom": "Wrangell, Alaska, USA"
+	},
+	"HNH": {
+		"lat": 58.11019,
+		"lng": -135.44444,
+		"nom": "Hoonah, Alaska, USA"
+	},
+	"CZM": {
+		"lat": 20.43206,
+		"lng": -86.92069,
+		"nom": "Cozumel, Mexico"
+	},
+	"PVR": {
+		"lat": 20.64072,
+		"lng": -105.22031,
+		"nom": "Puerto Vallarta, Mexico"
+	},
+	"MZT": {
+		"lat": 23.20358,
+		"lng": -106.42084,
+		"nom": "Mazatlan, Mexico"
+	},
+	"SJD": {
+		"lat": 22.89389,
+		"lng": -109.92006,
+		"nom": "Cabo San Lucas, Mexico"
+	},
+	"CCZ": { "lat": 25.0843, "lng": -77.9374, "nom": "CocoCay, Bahamas" },
+	"HMC": { "lat": 24.7317, "lng": -77.7093, "nom": "Half Moon Cay, Bahamas" },
+	"OCN": { "lat": 25.3747, "lng": -79.1483, "nom": "Ocean Cay, Bahamas" },
+	"MAH": {
+		"lat": 18.72573,
+		"lng": -87.70723,
+		"nom": "Mahahual, Mexico"
+	},
+	"BKK": { "lat": 13.0818, "lng": 100.8981, "nom": "Laem Chabang, Bangkok, Thailand" },
+	"PPT": { "lat": -17.5334, "lng": -149.5667, "nom": "Papeete, Tahiti, French Polynesia" },
+	"GSC": { "lat": 25.8333, "lng": -77.9167, "nom": "Great Stirrup Cay, Bahamas" },
+	"HVC": { "lat": 16.4833, "lng": -88.4167, "nom": "Harvest Caye, Belize" },
+	"PDC": {
+		"lat": 20.64611,
+		"lng": -87.0809,
+		"nom": "Playa del Carmen, Mexico"
+	},
+	"SJU": {
+		"lat": 18.4653,
+		"lng": -66.11667,
+		"nom": "San Juan, Puerto Rico"
+	},
+	"STT": {
+		"lat": 18.34146,
+		"lng": -64.93352,
+		"nom": "Charlotte Amalie, Saint Thomas, US Virgin Islands"
+	},
+	"SXM": {
+		"lat": 18.02507,
+		"lng": -63.04831,
+		"nom": "Philipsburg, Sint Maarten"
+	},
+	"ANU": {
+		"lat": 17.11846,
+		"lng": -61.84485,
+		"nom": "Saint John's, Antigua"
+	},
+	"SLU": {
+		"lat": 14.0096,
+		"lng": -60.99024,
+		"nom": "Castries, Saint Lucia"
+	},
+	"BGI": {
+		"lat": 13.09778,
+		"lng": -59.61842,
+		"nom": "Bridgetown, Barbados"
+	},
+	"GND": {
+		"lat": 12.05353,
+		"lng": -61.7518,
+		"nom": "Saint George's, Grenada"
+	},
+	"AUA": {
+		"lat": 12.5201,
+		"lng": -70.03713,
+		"nom": "Oranjestad, Aruba"
+	},
+	"CUR": {
+		"lat": 12.10667,
+		"lng": -68.93513,
+		"nom": "Willemstad, Curacao"
+	},
+	"FDF": {
+		"lat": 14.6028,
+		"lng": -61.06767,
+		"nom": "Fort-de-France, Martinique"
+	},
+	"PTP": {
+		"lat": 16.24086,
+		"lng": -61.53341,
+		"nom": "Pointe-a-Pitre, Guadeloupe"
+	},
+	"GCM": {
+		"lat": 19.29645,
+		"lng": -81.38311,
+		"nom": "George Town, Grand Cayman"
+	},
+	"NAS": {
+		"lat": 25.07823,
+		"lng": -77.33834,
+		"nom": "Nassau, Bahamas"
+	},
+	"FPO": {
+		"lat": 26.53568,
+		"lng": -78.69536,
+		"nom": "Freeport, Bahamas"
+	},
+	"GDT": {
+		"lat": 21.46077,
+		"lng": -71.14,
+		"nom": "Cockburn Town, Grand Turk"
+	},
+	"MBJ": {
+		"lat": 18.47246,
+		"lng": -77.92174,
+		"nom": "Montego Bay, Jamaica"
+	},
+	"BDA": {
+		"lat": 32.29427,
+		"lng": -64.78532,
+		"nom": "Hamilton, Bermuda"
+	},
+	"HAV": {
+		"lat": 23.1353,
+		"lng": -82.35896,
+		"nom": "Havana, Cuba"
+	},
+	"BZE": {
+		"lat": 17.50028,
+		"lng": -88.19887,
+		"nom": "Belize City, Belize"
+	},
+	"LIO": {
+		"lat": 10.09991,
+		"lng": -83.34319,
+		"nom": "Limon, Costa Rica"
+	},
+	"PCH": {
+		"lat": 9.09533,
+		"lng": -84.2003,
+		"nom": "Puntarenas, Costa Rica"
+	},
+	"ROA": {
+		"lat": 16.34902,
+		"lng": -86.49775,
+		"nom": "Roatan, Honduras"
+	},
+	"RTB": {
+		"lat": 16.32111,
+		"lng": -86.53831,
+		"nom": "Coxen Hole, Roatan, Honduras"
+	},
+	"CTG": {
+		"lat": 10.42656,
+		"lng": -75.54417,
+		"nom": "Cartagena, Colombia"
+	},
+	"EZE": {
+		"lat": -34.60956,
+		"lng": -58.38879,
+		"nom": "Buenos Aires, Argentina"
+	},
+	"MVD": {
+		"lat": -34.90589,
+		"lng": -56.19131,
+		"nom": "Montevideo, Uruguay"
+	},
+	"GIG": {
+		"lat": -22.91101,
+		"lng": -43.20937,
+		"nom": "Rio de Janeiro, Brazil"
+	},
+	"SSZ": {
+		"lat": -23.9336,
+		"lng": -46.32864,
+		"nom": "Santos, Brazil"
+	},
+	"USH": {
+		"lat": -54.80731,
+		"lng": -68.30841,
+		"nom": "Ushuaia, Argentina"
+	},
+	"PUQ": {
+		"lat": -53.16257,
+		"lng": -70.90782,
+		"nom": "Punta Arenas, Chile"
+	},
+	"VAP": {
+		"lat": -32.59761,
+		"lng": -70.85298,
+		"nom": "Valparaiso, Chile"
+	},
+	"LIM": {
+		"lat": -12.05226,
+		"lng": -77.13911,
+		"nom": "Callao, Lima, Peru"
+	},
+	"LEH": {
+		"lat": 49.4939,
+		"lng": 0.10797,
+		"nom": "Le Havre, France"
+	},
+	"LHR": {
+		"lat": 50.90253,
+		"lng": -1.40419,
+		"nom": "Southampton, England, UK"
+	},
+	"RTM": {
+		"lat": 51.92444,
+		"lng": 4.47775,
+		"nom": "Rotterdam, Netherlands"
+	},
+	"AMS": {
+		"lat": 52.37308,
+		"lng": 4.89245,
+		"nom": "Amsterdam, Netherlands"
+	},
+	"ZEE": {
+		"lat": 51.33122,
+		"lng": 3.20756,
+		"nom": "Zeebrugge, Belgium"
+	},
+	"DUB": {
+		"lat": 53.34938,
+		"lng": -6.26056,
+		"nom": "Dublin, Ireland"
+	},
+	"HAM": {
+		"lat": 53.55034,
+		"lng": 10.00065,
+		"nom": "Hamburg, Germany"
+	},
+	"CPH": {
+		"lat": 55.68672,
+		"lng": 12.57007,
+		"nom": "Copenhagen, Denmark"
+	},
+	"STO": {
+		"lat": 59.32512,
+		"lng": 18.07109,
+		"nom": "Stockholm, Sweden"
+	},
+	"HEL": {
+		"lat": 60.16662,
+		"lng": 24.94354,
+		"nom": "Helsinki, Finland"
+	},
+	"TLL": {
+		"lat": 59.43724,
+		"lng": 24.75727,
+		"nom": "Tallinn, Estonia"
+	},
+	"RIX": {
+		"lat": 56.9494,
+		"lng": 24.10518,
+		"nom": "Riga, Latvia"
+	},
+	"CDZ": {
+		"lat": 36.52974,
+		"lng": -6.2929,
+		"nom": "Cadiz, Spain"
+	},
+	"LIS": {
+		"lat": 38.70775,
+		"lng": -9.13659,
+		"nom": "Lisbon, Portugal"
+	},
+	"OPO": {
+		"lat": 41.15022,
+		"lng": -8.61035,
+		"nom": "Porto, Portugal"
+	},
+	"FNC": {
+		"lat": 32.64965,
+		"lng": -16.90868,
+		"nom": "Funchal, Madeira, Portugal"
+	},
+	"LPA": {
+		"lat": 28.07443,
+		"lng": -15.45136,
+		"nom": "Las Palmas, Gran Canaria, Spain"
+	},
+	"TFS": {
+		"lat": 28.46718,
+		"lng": -16.25078,
+		"nom": "Santa Cruz de Tenerife, Spain"
+	},
+	"BCN": {
+		"lat": 41.38258,
+		"lng": 2.17707,
+		"nom": "Barcelona, Spain"
+	},
+	"VLC": {
+		"lat": 39.46971,
+		"lng": -0.37634,
+		"nom": "Valencia, Spain"
+	},
+	"PMI": {
+		"lat": 39.56958,
+		"lng": 2.65007,
+		"nom": "Palma de Mallorca, Spain"
+	},
+	"MRS": {
+		"lat": 43.29617,
+		"lng": 5.36995,
+		"nom": "Marseille, France"
+	},
+	"NCE": {
+		"lat": 43.70094,
+		"lng": 7.26839,
+		"nom": "Nice, France"
+	},
+	"GEN": {
+		"lat": 44.40726,
+		"lng": 8.93386,
+		"nom": "Genoa, Italy"
+	},
+	"FCO": {
+		"lat": 42.09375,
+		"lng": 11.79225,
+		"nom": "Civitavecchia, Rome, Italy"
+	},
+	"NAP": {
+		"lat": 40.83588,
+		"lng": 14.24877,
+		"nom": "Naples, Italy"
+	},
+	"LIV": {
+		"lat": 42.79024,
+		"lng": 10.34022,
+		"nom": "Livorno, Italy"
+	},
+	"PMO": {
+		"lat": 38.11123,
+		"lng": 13.35244,
+		"nom": "Palermo, Sicily, Italy"
+	},
+	"VCE": {
+		"lat": 45.43719,
+		"lng": 12.33459,
+		"nom": "Venice, Italy"
+	},
+	"ATH": {
+		"lat": 37.97973,
+		"lng": 23.73,
+		"nom": "Piraeus, Athens, Greece"
+	},
+	"JMK": {
+		"lat": 37.45139,
+		"lng": 25.39231,
+		"nom": "Mykonos, Greece"
+	},
+	"JTR": {
+		"lat": 36.40711,
+		"lng": 25.45666,
+		"nom": "Santorini, Greece"
+	},
+	"HER": {
+		"lat": 35.33908,
+		"lng": 25.13328,
+		"nom": "Heraklion, Crete, Greece"
+	},
+	"RHO": {
+		"lat": 36.17253,
+		"lng": 27.9194,
+		"nom": "Rhodes, Greece"
+	},
+	"CFU": {
+		"lat": 39.59134,
+		"lng": 19.85962,
+		"nom": "Corfu, Greece"
+	},
+	"DBV": {
+		"lat": 42.6491,
+		"lng": 18.09395,
+		"nom": "Dubrovnik, Croatia"
+	},
+	"SPU": {
+		"lat": 43.51164,
+		"lng": 16.43997,
+		"nom": "Split, Croatia"
+	},
+	"IST": {
+		"lat": 41.00638,
+		"lng": 28.97587,
+		"nom": "Istanbul, Turkey"
+	},
+	"KUS": {
+		"lat": 37.86324,
+		"lng": 27.26687,
+		"nom": "Kusadasi, Turkey"
+	},
+	"MLA": {
+		"lat": 35.899,
+		"lng": 14.51366,
+		"nom": "Valletta, Malta"
+	},
+	"ALY": {
+		"lat": 31.19918,
+		"lng": 29.89517,
+		"nom": "Alexandria, Egypt"
+	},
+	"OSL": {
+		"lat": 59.91333,
+		"lng": 10.73897,
+		"nom": "Oslo, Norway"
+	},
+	"BGO": {
+		"lat": 60.39431,
+		"lng": 5.32592,
+		"nom": "Bergen, Norway"
+	},
+	"TOS": {
+		"lat": 69.65163,
+		"lng": 18.95586,
+		"nom": "Tromso, Norway"
+	},
+	"HVG": {
+		"lat": 70.98026,
+		"lng": 25.97784,
+		"nom": "Honningsvag, Norway"
+	},
+	"REY": {
+		"lat": 64.14598,
+		"lng": -21.94224,
+		"nom": "Reykjavik, Iceland"
+	},
+	"LYR": {
+		"lat": 78.22316,
+		"lng": 15.64637,
+		"nom": "Longyearbyen, Svalbard, Norway"
+	},
+	"GOH": {
+		"lat": 64.1767,
+		"lng": -51.73614,
+		"nom": "Nuuk, Greenland"
+	},
+	"HNL": {
+		"lat": 21.30455,
+		"lng": -157.85568,
+		"nom": "Honolulu, Hawaii, USA"
+	},
+	"OGG": {
+		"lat": 20.87477,
+		"lng": -156.45299,
+		"nom": "Kahului, Maui, Hawaii, USA"
+	},
+	"KOA": {
+		"lat": 19.64194,
+		"lng": -155.99693,
+		"nom": "Kailua-Kona, Hawaii, USA"
+	},
+	"LIH": {
+		"lat": 21.97696,
+		"lng": -159.36877,
+		"nom": "Lihue, Kauai, Hawaii, USA"
+	},
+	"ITO": {
+		"lat": 19.70737,
+		"lng": -155.08158,
+		"nom": "Hilo, Hawaii, USA"
+	},
+	"BOB": {
+		"lat": -16.50435,
+		"lng": -151.73669,
+		"nom": "Bora Bora, French Polynesia"
+	},
+	"MOZ": {
+		"lat": -17.53331,
+		"lng": -149.8386,
+		"nom": "Moorea, French Polynesia"
+	},
+	"NOU": {
+		"lat": -22.27453,
+		"lng": 166.44242,
+		"nom": "Noumea, New Caledonia"
+	},
+	"APW": {
+		"lat": -13.83452,
+		"lng": -171.7631,
+		"nom": "Apia, Samoa"
+	},
+	"SYD": {
+		"lat": -33.86984,
+		"lng": 151.20828,
+		"nom": "Sydney, Australia"
+	},
+	"MEL": {
+		"lat": -37.81425,
+		"lng": 144.96317,
+		"nom": "Melbourne, Australia"
+	},
+	"BNE": {
+		"lat": -27.36599,
+		"lng": 152.94896,
+		"nom": "Brisbane, Australia"
+	},
+	"AKL": {
+		"lat": -36.85209,
+		"lng": 174.76318,
+		"nom": "Auckland, New Zealand"
+	},
+	"WLG": {
+		"lat": -41.2888,
+		"lng": 174.77721,
+		"nom": "Wellington, New Zealand"
+	},
+	"DXB": {
+		"lat": 25.07428,
+		"lng": 55.18854,
+		"nom": "Dubai, UAE"
+	},
+	"AUH": {
+		"lat": 24.45384,
+		"lng": 54.3774,
+		"nom": "Abu Dhabi, UAE"
+	},
+	"MCT": {
+		"lat": 23.61236,
+		"lng": 58.59381,
+		"nom": "Muscat, Oman"
+	},
+	"BOM": {
+		"lat": 19.055,
+		"lng": 72.8692,
+		"nom": "Mumbai, India"
+	},
+	"COK": {
+		"lat": 9.9679,
+		"lng": 76.24444,
+		"nom": "Kochi, India"
+	},
+	"CMB": {
+		"lat": 6.93886,
+		"lng": 79.8542,
+		"nom": "Colombo, Sri Lanka"
+	},
+	"MLE": {
+		"lat": 4.17799,
+		"lng": 73.51074,
+		"nom": "Male, Maldives"
+	},
+	"SEZ": {
+		"lat": -4.6838,
+		"lng": 55.49264,
+		"nom": "Mahe, Seychelles"
+	},
+	"MRU": {
+		"lat": -20.16245,
+		"lng": 57.5028,
+		"nom": "Port Louis, Mauritius"
+	},
+	"RUN": {
+		"lat": -21.13093,
+		"lng": 55.52658,
+		"nom": "La Reunion, France"
+	},
+	"CPT": {
+		"lat": -33.92883,
+		"lng": 18.41722,
+		"nom": "Cape Town, South Africa"
+	},
+	"DUR": {
+		"lat": -29.86182,
+		"lng": 31.00991,
+		"nom": "Durban, South Africa"
+	},
+	"DSS": {
+		"lat": 14.69342,
+		"lng": -17.44794,
+		"nom": "Dakar, Senegal"
+	},
+	"SIN": {
+		"lat": 1.35711,
+		"lng": 103.8195,
+		"nom": "Singapore"
+	},
+	"HKT": {
+		"lat": 7.9366,
+		"lng": 98.35293,
+		"nom": "Phuket, Thailand"
+	},
+	"DAD": {
+		"lat": 16.068,
+		"lng": 108.212,
+		"nom": "Da Nang, Vietnam"
+	},
+	"SGN": {
+		"lat": 10.77553,
+		"lng": 106.7021,
+		"nom": "Ho Chi Minh City, Vietnam"
+	},
+	"PEN": {
+		"lat": 5.4065,
+		"lng": 100.25591,
+		"nom": "Penang, Malaysia"
+	},
+	"KUL": {
+		"lat": 3.00826,
+		"lng": 101.40544,
+		"nom": "Port Klang, Kuala Lumpur, Malaysia"
+	},
+	"DPS": {
+		"lat": -8.79583,
+		"lng": 115.21685,
+		"nom": "Benoa, Bali, Indonesia"
+	},
+	"MNL": {
+		"lat": 14.59045,
+		"lng": 120.98036,
+		"nom": "Manila, Philippines"
+	},
+	"TYO": {
+		"lat": 35.45034,
+		"lng": 139.63438,
+		"nom": "Yokohama, Japan"
+	},
+	"OSA": {
+		"lat": 34.69324,
+		"lng": 135.19438,
+		"nom": "Kobe, Japan"
+	},
+	"FUK": {
+		"lat": 33.62512,
+		"lng": 130.618,
+		"nom": "Fukuoka, Japan"
+	},
+	"NGS": {
+		"lat": 33.11547,
+		"lng": 129.78743,
+		"nom": "Nagasaki, Japan"
+	},
+	"KAG": {
+		"lat": 31.52159,
+		"lng": 130.54741,
+		"nom": "Kagoshima, Japan"
+	},
+	"OKA": {
+		"lat": 26.21223,
+		"lng": 127.67915,
+		"nom": "Naha, Okinawa, Japan"
+	},
+	"CTS": {
+		"lat": 43.19068,
+		"lng": 140.9946,
+		"nom": "Otaru, Hokkaido, Japan"
+	},
+	"HIJ": {
+		"lat": 34.39172,
+		"lng": 132.45176,
+		"nom": "Hiroshima, Japan"
+	},
+	"HKG": {
+		"lat": 22.34922,
+		"lng": 114.1858,
+		"nom": "Hong Kong"
+	},
+	"SHA": {
+		"lat": 31.23127,
+		"lng": 121.47002,
+		"nom": "Shanghai, China"
+	},
+	"PUS": {
+		"lat": 35.17995,
+		"lng": 129.07524,
+		"nom": "Busan, South Korea"
+	},
+	"ICN": {
+		"lat": 37.456,
+		"lng": 126.7052,
+		"nom": "Incheon, South Korea"
+	},
+	"CJU": {
+		"lat": 33.48877,
+		"lng": 126.49871,
+		"nom": "Jeju, South Korea"
+	},
+	"TPE": {
+		"lat": 25.13172,
+		"lng": 121.74465,
+		"nom": "Keelung, Taiwan"
+	}
+}

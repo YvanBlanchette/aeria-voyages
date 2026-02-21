@@ -177,8 +177,19 @@ export function useCroisieres() {
 		OPTS_MOIS: [...new Set(toutes.map((c) => getMois(c["Date Départ"])).filter(Boolean))]
 			.sort((a, b) => a - b)
 			.map((m) => ({ value: String(m), label: MOIS_LONG[m].charAt(0).toUpperCase() + MOIS_LONG[m].slice(1) })),
-		OPTS_ANNEES: [...new Set(toutes.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))]
-			.sort()
-			.map((a) => ({ value: a, label: a })),
+		OPTS_ANNEES: [...new Set(toutes.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))].sort().map((a) => ({ value: a, label: a })),
 	};
+}
+
+export function partagerCroisiere(c) {
+	const prix = getPrixMin(c);
+	const texte = `🚢 ${c["Itinéraire"]} — ${c["Navire"]}\n📅 ${fmtPeriode(c["Date Départ"], c["Date Retour"])} · ${c["Nuits"]} nuits\n💰 À partir de ${prix.toLocaleString("fr-CA")} $ / pers.\n\nVia Aeria Voyages`;
+	const url = `https://aeriavoyages.com/?croisiere=${c.id}`;
+
+	if (navigator.share) {
+		navigator.share({ title: c["Itinéraire"], text: texte, url });
+	} else {
+		navigator.clipboard.writeText(`${texte}\n\n${url}`);
+		alert("Lien copié dans le presse-papier !");
+	}
 }

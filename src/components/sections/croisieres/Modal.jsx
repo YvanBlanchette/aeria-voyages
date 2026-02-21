@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { X, Ship, MessageCircle, Mail, ArrowLeft, Send, Loader2, ShipIcon, MapPin, Calendar, Building2 } from "lucide-react";
+import { X, Ship, MessageCircle, Mail, Send, Loader2, ShipIcon, MapPin, Calendar, Building2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import emailjs from "@emailjs/browser";
-import { GOLD, getPorts, fmtPeriode, buildMessengerUrl, getPrixMin } from "./constants";
+import { getPorts, fmtPeriode, buildMessengerUrl, getPrixMin } from "./constants";
+import CarteItineraire from "@/components/CarteItinéraire";
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -65,10 +66,9 @@ export default function Modal({ c, onClose }) {
 					<>
 						{/* ───── VUE DÉTAIL (inchangée) ─────*/}
 						<div className="relative h-60 overflow-hidden bg-stone-200">
-							<img
-								src={c["Image Itinéraire"]}
-								alt={c["Itinéraire"]}
-								className="size-full object-cover"
+							<CarteItineraire
+								ports={c["Ports"]}
+								height="240px"
 							/>
 							<div
 								className="absolute inset-0"
@@ -143,6 +143,43 @@ export default function Modal({ c, onClose }) {
 									</button>
 								</div>
 							</div>
+
+							<Separator />
+
+							{c["Image Navire"] && (
+								<div className="flex items-center gap-3 ">
+									<img
+										src={c["Image Navire"]}
+										alt={c["Navire"]}
+										className="h-14 w-24 object-cover rounded-sm"
+										onError={(e) => {
+											e.target.parentElement.style.display = "none";
+										}}
+									/>
+									<div className="flex-1">
+										<p className="text-[10px] text-stone-400 tracking-[0.1em] uppercase">Navire</p>
+										<p className="font-semibold text-stone-800 text-sm">{c["Navire"]}</p>
+										<p className="text-xs text-stone-500">{c["Croisiériste"]}</p>
+									</div>
+
+									{/* BOUTON SEG */}
+									{c["LienSEG"] && (
+										<a
+											href={c["LienSEG"]}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer shrink-0 flex flex-col items-center gap-1 text-gold hover:text-[#9a7a4a] transition-colors duration-200 group pr-10"
+										>
+											<MapPin className="size-6 animate-bounce group-hover:scale-105 transition-all duration-400" />
+											<span className="text-[12px] font-semibold tracking-wide uppercase whitespace-nowrap text-center leading-tight group-hover:scale-105 transition-all duration-400">
+												Réservez vos <br />
+												Excursions
+											</span>
+										</a>
+									)}
+								</div>
+							)}
+
 							<Separator />
 
 							<div className="flex justify-between">
@@ -202,25 +239,6 @@ export default function Modal({ c, onClose }) {
 									<p className="text-[10px] font-medium text-stone-400 mb-0.5">*Basé sur une occupation double.</p>
 								</div>
 							</div>
-							<Separator />
-
-							{c["Image Navire"] && (
-								<div className="flex items-center gap-3 bg-stone-50 p-3">
-									<img
-										src={c["Image Navire"]}
-										alt={c["Navire"]}
-										className="h-14 w-24 object-cover rounded-sm"
-										onError={(e) => {
-											e.target.parentElement.style.display = "none";
-										}}
-									/>
-									<div>
-										<p className="text-[10px] text-stone-400 tracking-[0.1em] uppercase">Navire</p>
-										<p className="font-semibold text-stone-800 text-sm">{c["Navire"]}</p>
-										<p className="text-xs text-stone-500">{c["Croisiériste"]}</p>
-									</div>
-								</div>
-							)}
 						</div>
 					</>
 				) : (

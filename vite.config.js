@@ -9,24 +9,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-        },
-    },
-    server: {
-        proxy: {
-            '/api': {
-                target: 'https://aeriavoyages.com',
-                changeOrigin: true,
-                secure: true,
-            },
-            '/data': {
-                target: 'https://aeriavoyages.com',
-                changeOrigin: true,
-                secure: true,
-            },
-        },
-    },
+	plugins: [react(), tailwindcss()],
+	resolve: {
+		alias: {
+			"@": path.resolve(__dirname, "./src"),
+		},
+	},
+	server: {
+		proxy: {
+			"/api": {
+				target: "http://localhost:3001", // ← local
+				changeOrigin: true,
+				secure: false,
+			},
+			"/data": {
+				target: "https://aeriavoyages.com",
+				changeOrigin: true,
+				secure: true,
+			},
+		},
+	},
 });

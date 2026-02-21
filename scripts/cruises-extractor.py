@@ -1,12 +1,14 @@
 import json
-import csv
 import re
 import os
 import time
 import sqlite3
 import random
+import requests
 from datetime import datetime
 from difflib import get_close_matches
+from pathlib import Path
+from urllib.parse import urlparse
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -17,6 +19,8 @@ from selenium.webdriver.chrome.options import Options
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
 DB_PATH     = os.path.join(BASE_DIR, "..", "db", "croisieres.db")
 JSON_DIR    = "/var/www/aeria-voyages/dist/data"
+IMG_DIR     = Path("/var/www/aeria-voyages/public_assets/img/navires")
+IMG_BASE    = "https://aeriavoyages.com/img/navires"
 
 SECTIONS = {
     "sud":       "https://www.voyagesconstellation.com/croisieres-sud",
@@ -40,6 +44,11 @@ INCL_LABEL = {'yes': 'Inclus', 'free': 'Gratuit', 'no': 'Non inclus'}
 SEG_BASE      = "https://www.shoreexcursionsgroup.com/results/"
 SEG_AFFILIATE = "source=portal&id=1771540&data=yvanblanchette%40aeriavoyages.com"
 
+IMG_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Referer": "https://www.voyagesconstellation.com/",
+}
+
 # ─────────────────────────────────────────
 #  REGEX COMPILÉES
 # ─────────────────────────────────────────
@@ -55,6 +64,41 @@ RE_ITIN   = re.compile(r'<div class="name">([^<]+)')
 RE_NAVIRE = re.compile(r'<div class="subname">([^<]+)')
 RE_DATE   = re.compile(r'<b>([^<]+)</b>')
 RE_PORT   = re.compile(r'(?:D[ée]part)\s+de\s+([^<\n]+)', re.I)
+
+# ─────────────────────────────────────────
+#  TÉLÉCHARGEMENT D'IMAGES
+# ─────────────────────────────────────────
+def telecharger_image_navire(url_source: str) -> str:
+    """
+    Télécharge l'image du navire si elle n'existe pas déjà localement.
+    Retourne l'URL locale si succès, l'URL source sinon.
+    """
+    if not url_source:
+        return url_source
+
+    IMG_DIR.mkdir(parents=True, exist_ok=True)
+
+    fichier = Path(urlparse(url_source).path).name
+    dest    = IMG_DIR / fichier
+    url_locale = f"{IMG_BASE}/{fichier}"
+
+    # Déjà téléchargée
+    if dest.exists() and dest.stat().st_size > 1000:
+        return url_locale
+
+    try:
+        r = requests.get(url_source, headers=IMG_HEADERS, timeout=15, stream=True)
+        if r.status_code == 200 and "image" in r.headers.get("Content-Type", ""):
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(8192):
+                    f.write(chunk)
+            return url_locale
+        else:
+            print(f"    ⚠️  Image non téléchargée (HTTP {r.status_code}) : {fichier}")
+    except Exception as e:
+        print(f"    ❌ Erreur téléchargement image : {e}")
+
+    return url_source  # fallback sur l'URL originale
 
 # ─────────────────────────────────────────
 #  EXTRACTION DES CODES DE PORTS
@@ -188,7 +232,6 @@ def charger_mapping_seg():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # Corrections de noms manuelles
     corrections = {}
     try:
         for row in cursor.execute(
@@ -198,7 +241,6 @@ def charger_mapping_seg():
     except Exception:
         print("  ⚠️  Table seg_name_corrections introuvable — corrections ignorées.")
 
-    # Mapping principal ship_name → ship_id / line_id
     mapping = {}
     try:
         for row in cursor.execute(
@@ -220,14 +262,9 @@ def generer_lien_seg(nom_navire, date_depart, nuits, corrections, mapping):
     """
     nom            = nom_navire.strip()
     nom_lower      = nom.lower()
-
-    # 1. Appliquer correction manuelle si elle existe
     seg_name_lower = corrections.get(nom_lower, nom).lower()
+    seg            = mapping.get(seg_name_lower)
 
-    # 2. Match exact dans le mapping
-    seg = mapping.get(seg_name_lower)
-
-    # 3. Fallback : matching flou
     if not seg:
         candidats = get_close_matches(seg_name_lower, mapping.keys(), n=1, cutoff=0.85)
         if candidats:
@@ -250,15 +287,19 @@ def generer_lien_seg(nom_navire, date_depart, nuits, corrections, mapping):
 def sauvegarder_db(tous_les_resultats):
     """Enregistre toutes les croisières dans SQLite et exporte les JSON par section."""
 
-    # Chargement du mapping SEG une seule fois pour tout le run
     corrections, mapping = charger_mapping_seg()
+
+    # Cache des images déjà traitées ce run (évite de re-télécharger le même navire)
+    cache_images = {}
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM mes_croisieres")
 
-    liens_ok   = 0
-    liens_vide = 0
+    liens_ok    = 0
+    liens_vide  = 0
+    imgs_ok     = 0
+    imgs_skip   = 0
 
     for c in tous_les_resultats:
         ports_str = ",".join(c.get('Ports', []))
@@ -270,6 +311,17 @@ def sauvegarder_db(tous_les_resultats):
             liens_ok += 1
         else:
             liens_vide += 1
+
+        # Téléchargement image navire avec cache
+        url_navire_orig = c['Image Navire']
+        if url_navire_orig in cache_images:
+            url_navire = cache_images[url_navire_orig]
+            imgs_skip += 1
+        else:
+            url_navire = telecharger_image_navire(url_navire_orig)
+            cache_images[url_navire_orig] = url_navire
+            if url_navire != url_navire_orig:
+                imgs_ok += 1
 
         cursor.execute('''
             INSERT INTO mes_croisieres (
@@ -284,15 +336,16 @@ def sauvegarder_db(tous_les_resultats):
             c['Prix Int.'], c['Prix Ext.'], c['Prix Balcon'],
             c['Prix Vol MTL Int.'], c['Prix Vol MTL Ext.'], c['Prix Vol MTL Balcon'],
             c['Boissons'], c['Pourboires'], c['WiFi'],
-            c['Image Itinéraire'], c['Image Navire'], c['Lien'], lien_seg, c['section']
+            c['Image Itinéraire'], url_navire, c['Lien'], lien_seg, c['section']
         ))
 
     conn.commit()
     conn.close()
     print(f"💾 {len(tous_les_resultats)} croisières enregistrées — "
-          f"✅ {liens_ok} liens SEG générés, ⚠️  {liens_vide} sans lien.")
+          f"✅ {liens_ok} liens SEG, ⚠️  {liens_vide} sans lien.")
+    print(f"🖼️  Images navires — ✅ {imgs_ok} téléchargées, ⏭️  {imgs_skip} depuis cache.")
 
-    # ── Export JSON par section pour React ────────────────────────────────────
+    # ── Export JSON par section pour React ───────────────────────────────────
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -447,7 +500,7 @@ def lancer_robot():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument(f"--user-agent={random.choice(USER_AGENTS)}")  # ← ajout
+    chrome_options.add_argument(f"--user-agent={random.choice(USER_AGENTS)}")
     chrome_options.binary_location = "/usr/bin/chromium-browser"
 
     driver = webdriver.Chrome(
