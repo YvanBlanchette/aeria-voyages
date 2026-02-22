@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+db/croisieres.db
+db/croisieres.db-shm
+db/croisieres.db-wal
