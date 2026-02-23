@@ -9,7 +9,7 @@ import os
 import sys
 
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
-DB_PATH        = os.path.join(BASE_DIR, "..", "croisieres.db")
+DB_PATH        = os.path.join(BASE_DIR, "..", "aeria.db")
 MIGRATIONS_DIR = os.path.join(BASE_DIR, "..", "migrations")
 
 def run_migrations():

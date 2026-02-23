@@ -8,7 +8,7 @@ import sqlite3
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH  = os.path.join(BASE_DIR, "..", "croisieres.db")
+DB_PATH  = os.path.join(BASE_DIR, "..", "aeria.db")
 
 db = sqlite3.connect(DB_PATH)
 

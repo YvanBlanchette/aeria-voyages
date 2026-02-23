@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""
+repopuler.py — Script master de repopulation complète de la DB Aeria Voyages
+Lance tous les scrapers dans le bon ordre.
+
+Usage :
+    python3 db/scripts/repopuler.py                    # tout repopuler
+    python3 db/scripts/repopuler.py --module navires   # un module seulement
+    python3 db/scripts/repopuler.py --liste            # liste des modules
+    python3 db/scripts/repopuler.py --dry-run          # voir sans exécuter
+"""
+
+import argparse, subprocess, sys, time
+from datetime import datetime
+from pathlib import Path
+
+# ── Config ────────────────────────────────────────────────────────────────────
+
+SCRIPTS_DIR = Path(__file__).parent
+DB_PATH     = SCRIPTS_DIR.parent / "croisieres.db"
+
+# Ordre d'exécution — les dépendances d'abord
+MODULES = [
+    {
+        "nom":         "ports",
+        "description": "Ports et escales de référence",
+        "script":      "populate_ports.py",
+        "args":        [],
+        "obligatoire": True,
+    },
+    {
+        "nom":         "croisieristes",
+        "description": "Compagnies de croisière (CruiseMapper)",
+        "script":      "scraper_navires.py",
+        "args":        ["--croisieristes-seulement"],
+        "obligatoire": True,
+    },
+    {
+        "nom":         "navires",
+        "description": "Navires de croisière (CruiseMapper)",
+        "script":      "scraper_navires.py",
+        "args":        [],
+        "obligatoire": True,
+    },
+    {
+        "nom":         "images",
+        "description": "Images navires + logos croisieristes",
+        "script":      "download_images.py",
+        "args":        ["--manquants"],
+        "obligatoire": False,
+    },
+    {
+        "nom":         "seg",
+        "description": "Mapping SEG (Shore Excursions Group)",
+        "script":      "scraper_seg.py",
+        "args":        [],
+        "obligatoire": False,
+    },
+    {
+        "nom":         "constellation",
+        "description": "Croisieres Voyages Constellation",
+        "script":      "scraper_constellation.py",
+        "args":        [],
+        "obligatoire": False,
+    },
+    {
+        "nom":         "acv",
+        "description": "Circuits Air Canada Vacations",
+        "script":      "worker-acv.py",
+        "args":        [],
+        "obligatoire": False,
+    },
+    {
+        "nom":         "exoticca",
+        "description": "Circuits Exoticca",
+        "script":      "scraper_exoticca.py",
+        "args":        [],
+        "obligatoire": False,
+    },
+    {
+        "nom":         "tripoppo",
+        "description": "Circuits Tripoppo",
+        "script":      "scraper_tripoppo.py",
+        "args":        [],
+        "obligatoire": False,
+    },
+]
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def ts():
+    return datetime.now().strftime("%H:%M:%S")
+
+def run_module(module: dict, dry_run: bool = False) -> bool:
+    script = SCRIPTS_DIR / module["script"]
+    if not script.exists():
+        print(f"  ⚠️  Script introuvable : {script}")
+        return False
+
+    cmd = [sys.executable, str(script)] + module["args"]
+    print(f"\n{'─'*60}")
+    print(f"  [{ts()}] 🚀 {module['nom'].upper()} — {module['description']}")
+    print(f"  Commande : {' '.join(cmd)}")
+    print(f"{'─'*60}\n")
+
+    if dry_run:
+        print("  [dry-run] Non exécuté.")
+        return True
+
+    debut = time.time()
+    try:
+        result = subprocess.run(cmd, cwd=SCRIPTS_DIR.parent)
+        duree  = time.time() - debut
+        if result.returncode == 0:
+            print(f"\n  ✅ {module['nom']} terminé en {duree:.0f}s")
+            return True
+        else:
+            print(f"\n  ❌ {module['nom']} — code retour {result.returncode}")
+            return False
+    except KeyboardInterrupt:
+        print(f"\n  ⏹️  Interrompu.")
+        raise
+    except Exception as e:
+        print(f"\n  ❌ Erreur : {e}")
+        return False
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+def main():
+    ap = argparse.ArgumentParser(description="Repopulation DB Aeria Voyages")
+    ap.add_argument("--module",  help="Exécuter un module spécifique")
+    ap.add_argument("--liste",   action="store_true", help="Lister les modules")
+    ap.add_argument("--dry-run", action="store_true", help="Voir sans exécuter")
+    ap.add_argument("--force",   action="store_true", help="Inclure modules non obligatoires")
+    args = ap.parse_args()
+
+    print("╔══════════════════════════════════════════════════════╗")
+    print("║   Aeria Voyages — Repopulation DB                   ║")
+    print(f"║   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}                             ║")
+    print("╚══════════════════════════════════════════════════════╝")
+
+    if args.liste:
+        print("\nModules disponibles :\n")
+        for m in MODULES:
+            flag = "✅ obligatoire" if m["obligatoire"] else "⚙️  optionnel"
+            print(f"  {m['nom']:<20} {flag:<20} {m['description']}")
+        return
+
+    if args.module:
+        module = next((m for m in MODULES if m["nom"] == args.module), None)
+        if not module:
+            print(f"❌ Module inconnu : {args.module}")
+            print(f"   Modules disponibles : {', '.join(m['nom'] for m in MODULES)}")
+            sys.exit(1)
+        run_module(module, dry_run=args.dry_run)
+        return
+
+    # Tout exécuter
+    modules_a_lancer = [m for m in MODULES if m["obligatoire"] or args.force]
+
+    print(f"\n📋 {len(modules_a_lancer)} modules à exécuter :")
+    for m in modules_a_lancer:
+        print(f"   - {m['nom']}")
+
+    resultats = {}
+    debut_global = time.time()
+
+    try:
+        for module in modules_a_lancer:
+            ok = run_module(module, dry_run=args.dry_run)
+            resultats[module["nom"]] = ok
+            if not ok and module["obligatoire"]:
+                print(f"\n⛔ Module obligatoire '{module['nom']}' a échoué. Arrêt.")
+                break
+    except KeyboardInterrupt:
+        print("\n\n⏹️  Repopulation interrompue.")
+
+    duree_totale = time.time() - debut_global
+
+    print(f"\n{'═'*60}")
+    print(f"  Bilan — {duree_totale/60:.1f} min")
+    print(f"{'═'*60}")
+    for nom, ok in resultats.items():
+        print(f"  {'✅' if ok else '❌'}  {nom}")
+    print()
+
+if __name__ == "__main__":
+    main()

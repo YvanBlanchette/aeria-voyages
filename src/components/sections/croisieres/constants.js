@@ -1,51 +1,97 @@
 import { useState, useEffect } from "react";
 
 // ── Imports logos ─────────────────────────────────────────────────────────────
-import logoRoyal    from "/logos/royal.png";
-import logoPrincess from "/logos/princess.png";
-import logoVirgin   from "/logos/virgin.png";
+import logoRoyal     from "/logos/royal.png";
+import logoPrincess  from "/logos/princess.png";
+import logoVirgin    from "/logos/virgin.png";
 import logoCelebrity from "/logos/celebrity.png";
-import logoNCL      from "/logos/ncl.png";
-import logoHAL      from "/logos/hal.png";
-import logoCunard   from "/logos/cunard.png";
-import logoSeabourn from "/logos/seabourn.png";
-import logoExplora  from "/logos/explora.png";
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  CONSTANTES GLOBALES
-// ─────────────────────────────────────────────────────────────────────────────
+import logoNCL       from "/logos/ncl.png";
+import logoHAL       from "/logos/hal.png";
+import logoCunard    from "/logos/cunard.png";
+import logoSeabourn  from "/logos/seabourn.png";
+import logoExplora   from "/logos/explora.png";
 
 export const MESSENGER_URL      = "https://m.me/yvanblanchettecvc";
 export const COMPAGNIES_EXCLUES = new Set(["Carnival Cruise Line"]);
 export const ITEMS_PAR_PAGE     = 9;
 export const GOLD               = "#B8935C";
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  DESTINATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const DESTINATION_LABELS = {
-	caraibes: "Caraïbes",
-	europe:   "Europe",
-	alaska:   "Alaska",
-	exotiques: "Exotiques",
+	caraibes_est:      "Caraïbes de l'Est",
+	caraibes_ouest:    "Caraïbes de l'Ouest",
+	caraibes_sud:      "Caraïbes du Sud",
+	bahamas:           "Bahamas",
+	bermudes:          "Bermudes",
+	riviera_mexicaine: "Riviera Mexicaine",
+	canal_panama:      "Canal de Panama",
+	cote_est:          "Côte Est & N.-Angleterre",
+	amerique_sud:      "Amérique du Sud",
+	alaska:            "Alaska",
+	hawaii:            "Hawaï",
+	cote_pacifique:    "Côte Pacifique",
+	mediterranee:      "Méditerranée",
+	europe_nord:       "Europe du Nord",
+	transatlantique:   "Transatlantique",
+	asie:              "Asie",
+	pacifique_sud:     "Pacifique Sud",
+	moyen_orient:      "Moyen-Orient",
+	ocean_indien:      "Océan Indien",
+	afrique:           "Afrique",
 };
 
-export const DESTINATIONS_ORDRE = ["caraibes", "europe", "alaska", "exotiques"];
+export const DESTINATION_GROUPES = [
+	{
+		label: "Caraïbes & Amériques",
+		destinations: [
+			"caraibes_est","caraibes_ouest","caraibes_sud",
+			"bahamas","bermudes","riviera_mexicaine",
+			"canal_panama","cote_est","amerique_sud",
+		],
+	},
+	{
+		label: "Pacifique & Amérique du Nord",
+		destinations: ["alaska","hawaii","cote_pacifique"],
+	},
+	{
+		label: "Europe",
+		destinations: ["mediterranee","europe_nord","transatlantique"],
+	},
+	{
+		label: "Reste du monde",
+		destinations: ["asie","pacifique_sud","moyen_orient","ocean_indien","afrique"],
+	},
+];
+
+export const DESTINATIONS_ORDRE = [
+	"caraibes_est","caraibes_ouest","caraibes_sud",
+	"bahamas","bermudes","riviera_mexicaine",
+	"canal_panama","cote_est","amerique_sud",
+	"alaska","hawaii","cote_pacifique",
+	"mediterranee","europe_nord","transatlantique",
+	"asie","pacifique_sud","moyen_orient","ocean_indien","afrique",
+];
 
 export const LOGOS_CONFIG = {
-	"Royal Caribbean":      { src: logoRoyal,     maxH: 32 },
-	"Princess Cruises":     { src: logoPrincess,  maxH: 28 },
-	"Virgin Voyages":       { src: logoVirgin,    maxH: 36 },
-	"Celebrity Cruises":    { src: logoCelebrity, maxH: 36 },
-	"Norwegian Cruise Line":{ src: logoNCL,       maxH: 30 },
-	"Holland America Line": { src: logoHAL,       maxH: 32 },
-	"Cunard Line":          { src: logoCunard,    maxH: 32 },
-	"Seabourn":             { src: logoSeabourn,  maxH: 28 },
-	"Explora Journeys":     { src: logoExplora,   maxH: 28 },
+	"Royal Caribbean":       { src: logoRoyal,     maxH: 32 },
+	"Princess Cruises":      { src: logoPrincess,  maxH: 28 },
+	"Virgin Voyages":        { src: logoVirgin,    maxH: 36 },
+	"Celebrity Cruises":     { src: logoCelebrity, maxH: 36 },
+	"Norwegian Cruise Line": { src: logoNCL,       maxH: 30 },
+	"Holland America Line":  { src: logoHAL,       maxH: 32 },
+	"Cunard Line":           { src: logoCunard,    maxH: 32 },
+	"Seabourn":              { src: logoSeabourn,  maxH: 28 },
+	"Explora Journeys":      { src: logoExplora,   maxH: 28 },
 };
 
 export const DUREES = [
-	{ label: "3 – 5 nuits",  min: 3,  max: 5   },
-	{ label: "6 – 9 nuits",  min: 6,  max: 9   },
-	{ label: "10 – 14 nuits",min: 10, max: 14  },
-	{ label: "15 nuits +",   min: 15, max: 999 },
+	{ label: "3 – 5 nuits",   min: 3,  max: 5   },
+	{ label: "6 – 9 nuits",   min: 6,  max: 9   },
+	{ label: "10 – 14 nuits", min: 10, max: 14  },
+	{ label: "15 nuits +",    min: 15, max: 999 },
 ];
 
 export const TRI_OPTIONS = [
@@ -66,25 +112,23 @@ export const MOIS_LONG = [
 //  UTILITAIRES — DATES & PRIX
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const getMois   = (iso) => (iso && iso !== "N/A" ? parseInt(iso.split("-")[1]) : 0);
-export const getAnnee  = (iso) => (iso && iso !== "N/A" ? iso.split("-")[0] : "");
-export const getJour   = (iso) => (iso && iso !== "N/A" ? parseInt(iso.split("-")[2]) : 0);
-export const getPrixMin = (c)  => c["Prix Int."] || c["Prix Ext."] || c["Prix Balcon"] || 0;
+export const getMois    = (iso) => (iso && iso !== "N/A" ? parseInt(iso.split("-")[1]) : 0);
+export const getAnnee   = (iso) => (iso && iso !== "N/A" ? iso.split("-")[0] : "");
+export const getJour    = (iso) => (iso && iso !== "N/A" ? parseInt(iso.split("-")[2]) : 0);
+export const getPrixMin = (c)   => c["Prix Int."] || c["Prix Ext."] || c["Prix Balcon"] || 0;
 
 export function fmtPeriode(dep, ret) {
 	if (!dep || dep === "N/A") return "—";
 	const [jD, mD, aD] = [getJour(dep), getMois(dep), getAnnee(dep)];
 	const [jR, mR, aR] = [getJour(ret), getMois(ret), getAnnee(ret)];
-	if (!ret || ret === "N/A")       return `${jD} ${MOIS_LONG[mD]} ${aD}`;
-	if (mD === mR && aD === aR)      return `${jD} au ${jR} ${MOIS_LONG[mR]} ${aD}`;
-	if (aD === aR)                   return `${jD} ${MOIS_LONG[mD]} au ${jR} ${MOIS_LONG[mR]} ${aD}`;
+	if (!ret || ret === "N/A")  return `${jD} ${MOIS_LONG[mD]} ${aD}`;
+	if (mD === mR && aD === aR) return `${jD} au ${jR} ${MOIS_LONG[mR]} ${aD}`;
+	if (aD === aR)              return `${jD} ${MOIS_LONG[mD]} au ${jR} ${MOIS_LONG[mR]} ${aD}`;
 	return `${jD} ${MOIS_LONG[mD]} ${aD} au ${jR} ${MOIS_LONG[mR]} ${aR}`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  UTILITAIRES — PORTS
-//  Les ports sont résolus côté serveur avant d'arriver ici.
-//  getPorts retourne simplement le tableau déjà prêt.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function getPorts(c) {
@@ -131,7 +175,6 @@ export function partagerCroisiere(c) {
 		`📅 ${fmtPeriode(c["Date Départ"], c["Date Retour"])} · ${c["Nuits"]} nuits\n` +
 		`💰 À partir de ${prix.toLocaleString("fr-CA")} $ / pers.\n\nVia Aeria Voyages`;
 	const url = `https://aeriavoyages.com/?croisiere=${c.id}`;
-
 	if (navigator.share) {
 		navigator.share({ title: c["Itinéraire"], text: texte, url });
 	} else {
@@ -158,7 +201,7 @@ export const COMPARATEURS = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useCroisieres({ excludeUSA = false } = {}) {
-	const [toutes, setToutes]       = useState([]);
+	const [toutes, setToutes]         = useState([]);
 	const [chargement, setChargement] = useState(true);
 
 	useEffect(() => {
@@ -170,16 +213,14 @@ export function useCroisieres({ excludeUSA = false } = {}) {
 			.finally(() => setChargement(false));
 	}, [excludeUSA]);
 
-	const DESTS_ACTIVES = new Set(toutes.map((c) => c._dest));
+	const DESTS_ACTIVES = new Set(toutes.map((c) => c.destination).filter(Boolean));
 
 	return {
 		toutes,
 		chargement,
-		OPTS_DEST: DESTINATIONS_ORDRE.map((d) => ({
-			value:    d,
-			label:    DESTINATION_LABELS[d],
-			disabled: !DESTS_ACTIVES.has(d),
-		})),
+		OPTS_DEST: DESTINATIONS_ORDRE
+			.filter((d) => DESTS_ACTIVES.has(d))
+			.map((d) => ({ value: d, label: DESTINATION_LABELS[d] })),
 		OPTS_COMPAGNIES: [...new Set(toutes.map((c) => c["Croisiériste"]))]
 			.sort()
 			.map((c) => ({ value: c, label: c })),

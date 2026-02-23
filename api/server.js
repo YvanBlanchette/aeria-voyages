@@ -10,7 +10,7 @@ const cheerio = require("cheerio");
 
 const app = express();
 const PORT = 3001;
-const DB_PATH = path.join(__dirname, "..", "db", "croisieres.db");
+const DB_PATH = path.join(__dirname, "..", "db", "aeria.db");
 
 app.use(cors());
 app.use(express.json());
@@ -174,7 +174,7 @@ app.get("/api/croisieres", (req, res) => {
 			"Image Itinéraire":  r.image_itin,
 			"Image Navire":      r.image_navire,
 			Lien:                r.lien_constellation,
-			_dest:               r.section === "sud" ? "caraibes" : r.section,
+			destination: r.destination,
 		})));
 	} catch (err) {
 		res.status(500).json({ error: err.message });

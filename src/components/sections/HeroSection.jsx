@@ -32,10 +32,13 @@ const HeroSection = () => {
 						Des expériences de voyage exceptionnelles conçues pour les voyageurs qui veulent vivre l'extraordinaire.
 					</p>
 					<Button
+						asChild={true}
 						size="lg"
 						className="bg-gold hover:bg-white hover:text-charcoal text-white text-sm tracking-[0.2em] uppercase font-semibold fade-in delay-800"
 					>
+						<a href="#croisieres">
 						Découvrir Nos Voyages
+						</a>
 					</Button>
 				</div>
 			</div>
