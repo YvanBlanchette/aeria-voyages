@@ -3,6 +3,8 @@ import { X, Ship, MessageCircle, Mail, ArrowLeft, Send, Loader2, ShipIcon, MapPi
 import { Separator } from "@/components/ui/separator";
 import emailjs from "@emailjs/browser";
 import { GOLD, getPorts, fmtPeriode, buildMessengerUrl, getPrixMin } from "./constants";
+import { Share2 } from "lucide-react";
+import { partagerCroisiere } from "./constants";
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -141,6 +143,15 @@ export default function Modal({ c, onClose }) {
 										<Mail className="size-5" />
 										Demande d'informations
 									</button>
+
+									{/* PARTAGER */}
+									<button
+										onClick={() => partagerCroisiere(c, () => alert("Lien copié dans le presse-papier !"))}
+										className="rounded-sm cursor-pointer flex w-full items-center justify-center gap-2.5 py-3.5 px-6 font-semibold text-sm text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors duration-200"
+									>
+										<Share2 className="size-5" />
+										Partager cette offre
+									</button>
 								</div>
 							</div>
 							<Separator />
@@ -205,20 +216,48 @@ export default function Modal({ c, onClose }) {
 							<Separator />
 
 							{c["Image Navire"] && (
-								<div className="flex items-center gap-3 bg-stone-50 p-3">
-									<img
-										src={c["Image Navire"]}
-										alt={c["Navire"]}
-										className="h-14 w-24 object-cover rounded-sm"
-										onError={(e) => {
-											e.target.parentElement.style.display = "none";
-										}}
-									/>
-									<div>
-										<p className="text-[10px] text-stone-400 tracking-[0.1em] uppercase">Navire</p>
-										<p className="font-semibold text-stone-800 text-sm">{c["Navire"]}</p>
-										<p className="text-xs text-stone-500">{c["Croisiériste"]}</p>
+								<div className="flex items-center justify-between bg-stone-50 p-3">
+									<div className="flex items-center gap-3 w-1/2">
+										<img
+											src={c["Image Navire"]}
+											alt={c["Navire"]}
+											className="h-14 w-24 object-cover rounded-sm"
+											onError={(e) => {
+												e.target.parentElement.style.display = "none";
+											}}
+										/>
+										<div>
+											<p className="text-[10px] text-stone-400 tracking-[0.1em] uppercase">Navire</p>
+											<p className="font-semibold text-stone-800 text-sm">{c["Navire"]}</p>
+											<p className="text-xs text-stone-500">{c["Croisiériste"]}</p>
+										</div>
 									</div>
+
+									{/* EXCURSIONS */}
+									{c["LienSEG"] && (
+									<div className="flex flex-col items-end justify-center w-1/2">
+									<a
+											href={c["LienSEG"]}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="rounded-sm flex items-center justify-center bg-[#FBAA1B] hover:bg-[#FBAA1B]/80 gap-2.5 py-3.5 px-6 font-semibold text-sm text-white bg-[#0070da] hover:bg-[#0084ff] transition-colors duration-200"
+											>
+											<Ship className="size-5" />
+											Excursions SEG
+											</a>
+											{/* {c["LienVentAsh"] && (
+												<a
+													href={c["LienVentAsh"]}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="rounded-sm flex w-full items-center justify-center gap-2.5 py-3.5 px-6 font-semibold text-sm text-white bg-emerald-700 hover:bg-emerald-600 transition-colors duration-200"
+												>
+													<Ship className="size-5" />
+													Excursions Venture Ashore
+												</a>
+											)} */}
+							</div>
+								)}
 								</div>
 							)}
 						</div>

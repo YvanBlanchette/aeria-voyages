@@ -13,7 +13,7 @@ import logoExplora   from "/logos/explora.png";
 
 export const MESSENGER_URL      = "https://m.me/yvanblanchettecvc";
 export const COMPAGNIES_EXCLUES = new Set(["Carnival Cruise Line"]);
-export const ITEMS_PAR_PAGE     = 9;
+export const ITEMS_PAR_PAGE     = 24;
 export const GOLD               = "#B8935C";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -168,23 +168,8 @@ export function buildEmailUrl(c) {
 	return `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("info@aeriavoyages.com")}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
 }
 
-export function partagerCroisiere(c) {
-	const prix  = getPrixMin(c);
-	const texte =
-		`🚢 ${c["Itinéraire"]} — ${c["Navire"]}\n` +
-		`📅 ${fmtPeriode(c["Date Départ"], c["Date Retour"])} · ${c["Nuits"]} nuits\n` +
-		`💰 À partir de ${prix.toLocaleString("fr-CA")} $ / pers.\n\nVia Aeria Voyages`;
-	const url = `https://aeriavoyages.com/?croisiere=${c.id}`;
-	if (navigator.share) {
-		navigator.share({ title: c["Itinéraire"], text: texte, url });
-	} else {
-		navigator.clipboard.writeText(`${texte}\n\n${url}`);
-		alert("Lien copié dans le presse-papier !");
-	}
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
-//  COMPARATEURS DE TRI
+//  COMPARATEURS DE TRI (gardés pour compatibilité éventuelle)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const COMPARATEURS = {
@@ -197,39 +182,162 @@ export const COMPARATEURS = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  HOOK — useCroisieres
+//  HOOK — useCroisieresMeta  (options de filtres — chargé une seule fois)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function useCroisieres({ excludeUSA = false } = {}) {
-	const [toutes, setToutes]         = useState([]);
+export function useCroisieresMeta() {
+	const [meta, setMeta] = useState(null);
+
+	useEffect(() => {
+		fetch("/api/croisieres/meta")
+			.then((r) => r.json())
+			.then(setMeta)
+			.catch(console.error);
+	}, []);
+
+	return {
+		OPTS_COMPAGNIES: (meta?.compagnies ?? [])
+			.filter((c) => !COMPAGNIES_EXCLUES.has(c))
+			.map((c) => ({ value: c, label: c })),
+		OPTS_DUREES: DUREES.map((d, i) => ({ value: String(i), label: d.label })),
+		OPTS_MOIS: (meta?.mois ?? [])
+			.map((m) => ({ value: String(m), label: MOIS_LONG[m].charAt(0).toUpperCase() + MOIS_LONG[m].slice(1) })),
+		OPTS_ANNEES: (meta?.annees ?? [])
+			.map((a) => ({ value: a, label: a })),
+		OPTS_DEST: DESTINATIONS_ORDRE.map((d) => ({ value: d, label: DESTINATION_LABELS[d] })),
+	};
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HOOK — useCroisieres  (données paginées avec filtres côté serveur)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function useCroisieres({
+	excludeUSA  = false,
+	fDests      = [],
+	fComps      = [],
+	fNavires    = [],   // ← ajouter
+	fDurees     = [],
+	fMois       = [],
+	fAnnees     = [],
+	tri         = "date-asc",
+	page        = 1,
+	limit       = ITEMS_PAR_PAGE,
+} = {}) {
+	const [croisieres, setCroisieres] = useState([]);
+	const [total, setTotal]           = useState(0);
 	const [chargement, setChargement] = useState(true);
 
 	useEffect(() => {
 		setChargement(true);
-		const url = excludeUSA ? "/api/croisieres?exclude_usa=true" : "/api/croisieres";
-		fetch(url)
+
+		const params = new URLSearchParams();
+		if (excludeUSA)        params.set("exclude_usa", "true");
+		if (fDests.length > 0) params.set("destination", fDests.join(","));
+		if (fComps.length > 0) params.set("croisieriste", fComps.join(","));
+		if (fNavires.length > 0) params.set("navire", fNavires.join(","));
+		if (fMois.length === 1) params.set("mois", fMois[0]);
+		if (fAnnees.length === 1) params.set("annee", fAnnees[0]);
+		if (fDurees.length > 0) {
+			// Prend la plage min/max englobant toutes les durées sélectionnées
+			const mins = fDurees.map((i) => DUREES[+i].min);
+			const maxs = fDurees.map((i) => DUREES[+i].max);
+			params.set("duree_min", Math.min(...mins));
+			params.set("duree_max", Math.max(...maxs));
+		}
+		params.set("tri", tri);
+		params.set("limit", limit);
+		params.set("offset", (page - 1) * limit);
+
+		fetch(`/api/croisieres?${params.toString()}`)
 			.then((r) => r.json())
-			.then((data) => setToutes(data.filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"]))))
+			.then((json) => {
+				setCroisieres((json.data ?? []).filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"])));
+				setTotal(json.total ?? 0);
+			})
+			.catch(console.error)
 			.finally(() => setChargement(false));
-	}, [excludeUSA]);
+	}, [excludeUSA, fDests.join(","), fComps.join(","), fNavires.join(","), fDurees.join(","), fMois.join(","), fAnnees.join(","), tri, page, limit]);
 
-	const DESTS_ACTIVES = new Set(toutes.map((c) => c.destination).filter(Boolean));
+	return { croisieres, total, chargement };
+}
 
-	return {
-		toutes,
-		chargement,
-		OPTS_DEST: DESTINATIONS_ORDRE
-			.filter((d) => DESTS_ACTIVES.has(d))
-			.map((d) => ({ value: d, label: DESTINATION_LABELS[d] })),
-		OPTS_COMPAGNIES: [...new Set(toutes.map((c) => c["Croisiériste"]))]
-			.sort()
-			.map((c) => ({ value: c, label: c })),
-		OPTS_DUREES: DUREES.map((d, i) => ({ value: String(i), label: d.label })),
-		OPTS_MOIS: [...new Set(toutes.map((c) => getMois(c["Date Départ"])).filter(Boolean))]
-			.sort((a, b) => a - b)
-			.map((m) => ({ value: String(m), label: MOIS_LONG[m].charAt(0).toUpperCase() + MOIS_LONG[m].slice(1) })),
-		OPTS_ANNEES: [...new Set(toutes.map((c) => getAnnee(c["Date Départ"])).filter(Boolean))]
-			.sort()
-			.map((a) => ({ value: a, label: a })),
-	};
+// ─────────────────────────────────────────────────────────────────────────────
+//  PARTAGE
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function chargerImageFichier(url, nom) {
+	try {
+		const response = await fetch(url);
+		const blob = await response.blob();
+		return new File([blob], nom, { type: blob.type });
+	} catch {
+		return null;
+	}
+}
+
+export async function partagerCroisiere(c, fallbackMsg) {
+	const ports = getPorts(c);
+
+	const itineraireTexte = ports.length > 0
+		? ports.join(" → ")
+		: c["Itinéraire"];
+
+	const prixLignes = [
+		c["Prix Int."]   > 0 ? `  • Intérieure : ${c["Prix Int."].toLocaleString("fr-CA")} $`   : null,
+		c["Prix Ext."]   > 0 ? `  • Extérieure : ${c["Prix Ext."].toLocaleString("fr-CA")} $`   : null,
+		c["Prix Balcon"] > 0 ? `  • Balcon     : ${c["Prix Balcon"].toLocaleString("fr-CA")} $`  : null,
+	].filter(Boolean).join("\n");
+
+	const texte =
+		`🚢 ${c["Itinéraire"]}\n\n` +
+		`🗺️ ${itineraireTexte}\n\n` +
+		`🛳️ Navire    : ${c["Navire"]} (${c["Croisiériste"]})\n` +
+		`📍 Départ    : ${c["Port Départ"] || "N/A"}\n` +
+		`📅 Période   : ${fmtPeriode(c["Date Départ"], c["Date Retour"])} · ${c["Nuits"]} nuits\n\n` +
+		`💰 Prix par personne (occ. double, taxes incl.) :\n${prixLignes}\n\n` +
+		`✈️ Réservez avec Aeria Voyages :\n👉 https://aeriavoyages.com`;
+
+	if (navigator.share) {
+		try {
+			const [imgItineraire, imgNavire] = await Promise.all([
+				c["Image Itinéraire"] ? chargerImageFichier(c["Image Itinéraire"], "itineraire.jpg") : null,
+				c["Image Navire"]     ? chargerImageFichier(c["Image Navire"], "navire.jpg")         : null,
+			]);
+
+			const fichiers = [imgItineraire, imgNavire].filter(Boolean);
+
+			if (fichiers.length > 0 && navigator.canShare({ files: fichiers })) {
+				await navigator.share({
+					title: `🚢 ${c["Itinéraire"]} – ${c["Nuits"]} nuits`,
+					text: texte,
+					files: fichiers,
+				});
+			} else {
+				await navigator.share({
+					title: `🚢 ${c["Itinéraire"]} – ${c["Nuits"]} nuits`,
+					text: texte,
+				});
+			}
+		} catch (e) {
+			if (e.name !== "AbortError") console.error(e);
+		}
+	} else {
+		await navigator.clipboard.writeText(texte);
+		fallbackMsg?.();
+	}
+}
+
+export function useNavires(fComps) {
+	const [navires, setNavires] = useState([]);
+
+	useEffect(() => {
+		if (fComps.length === 0) { setNavires([]); return; }
+		fetch(`/api/croisieres/navires?croisieriste=${fComps.join(",")}`)
+			.then((r) => r.json())
+			.then(setNavires)
+			.catch(console.error);
+	}, [fComps.join(",")]);
+
+	return navires.map((n) => ({ value: n, label: n }));
 }

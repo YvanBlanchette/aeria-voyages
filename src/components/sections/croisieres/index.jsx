@@ -1,4 +1,12 @@
-import { useState, useMemo, useCallback } from "react";
+// Ligne des imports React — retire useMemo
+import { useState, useCallback } from "react";
+
+// Ligne des imports constants — ajoute useNavires
+import {
+	GOLD, ITEMS_PAR_PAGE, DUREES, TRI_OPTIONS,
+	DESTINATION_LABELS, DESTINATION_GROUPES,
+	useCroisieres, useCroisieresMeta, useNavires,
+} from "./constants";
 import { X, Anchor, ChevronDown, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -7,10 +15,7 @@ import MultiSelect from "./MultiSelect";
 import CarteCroisiere from "./CarteCroisiere";
 import Modal from "./Modal";
 
-import {
-	GOLD, ITEMS_PAR_PAGE, DUREES, TRI_OPTIONS, COMPARATEURS,
-	getMois, getAnnee, useCroisieres, DESTINATION_LABELS, DESTINATION_GROUPES
-} from "./constants";
+
 import { Separator } from "@/components/ui/separator";
 
 export default function CroisieresSection() {
@@ -25,13 +30,27 @@ export default function CroisieresSection() {
 	const [tri, setTri]           = useState("date-asc");
 	const [excludeUSA, setExcludeUSA] = useState(false);
 
-	const { toutes: TOUTES, chargement, OPTS_DEST, OPTS_COMPAGNIES, OPTS_DUREES, OPTS_MOIS, OPTS_ANNEES } = useCroisieres({ excludeUSA });
+	// Options de filtres — chargées une seule fois
+	const { OPTS_DEST, OPTS_COMPAGNIES, OPTS_DUREES, OPTS_MOIS, OPTS_ANNEES } = useCroisieresMeta();
 
-	const OPTS_NAVIRES = useMemo(() => {
-		const base = fComps.length > 0 ? TOUTES.filter((c) => fComps.includes(c["Croisiériste"])) : TOUTES;
-		return [...new Set(base.map((c) => c["Navire"]))]
-			.filter(Boolean).sort().map((n) => ({ value: n, label: n }));
-	}, [TOUTES, fComps]);
+	// Données paginées — rechargées à chaque changement de filtre/page
+const { croisieres: affichees, total, chargement } = useCroisieres({
+	excludeUSA,
+	fDests,
+	fComps,
+	fNavires,
+	fDurees,
+	fMois,
+	fAnnees,
+	tri,
+	page,
+	limit: ITEMS_PAR_PAGE,
+});
+
+	const nbPages = Math.ceil(total / ITEMS_PAR_PAGE);
+
+	// Navires filtrés selon compagnie sélectionnée
+const OPTS_NAVIRES = useNavires(fComps);
 
 	const reset = useCallback(() => {
 		setFDests([]); setFComps([]); setFNavires([]);
@@ -41,37 +60,15 @@ export default function CroisieresSection() {
 
 	const handleCompsChange = useCallback((val) => {
 		setFComps(val);
-		setFNavires((prev) => {
-			if (val.length === 0) return [];
-			const valides = new Set(TOUTES.filter((c) => val.includes(c["Croisiériste"])).map((c) => c["Navire"]));
-			return prev.filter((n) => valides.has(n));
-		});
+		if (val.length === 0) setFNavires([]);
 		setPage(1);
-	}, [TOUTES]);
+	}, []);
 
 	const filtresActifs = fDests.length > 0 || fComps.length > 0 || fNavires.length > 0
 		|| fDurees.length > 0 || fMois.length > 0 || fAnnees.length > 0 || excludeUSA;
 
-	const filtrees = useMemo(() => {
-		let r = TOUTES;
-		if (fDests.length > 0)  r = r.filter((c) => fDests.includes(c.destination));
-		if (fComps.length > 0)  r = r.filter((c) => fComps.includes(c["Croisiériste"]));
-		if (fNavires.length > 0) r = r.filter((c) => fNavires.includes(c["Navire"]));
-		if (fMois.length > 0)   r = r.filter((c) => fMois.includes(String(getMois(c["Date Départ"]))));
-		if (fAnnees.length > 0) r = r.filter((c) => fAnnees.includes(getAnnee(c["Date Départ"])));
-		if (fDurees.length > 0)
-			r = r.filter((c) => fDurees.some((i) => {
-				const { min, max } = DUREES[+i];
-				return c["Nuits"] >= min && c["Nuits"] <= max;
-			}));
-		return [...r].sort(COMPARATEURS[tri] ?? COMPARATEURS["date-asc"]);
-	}, [TOUTES, fDests, fComps, fNavires, fDurees, fMois, fAnnees, tri]);
-
-	const nbPages  = Math.ceil(filtrees.length / ITEMS_PAR_PAGE);
-	const affichees = filtrees.slice((page - 1) * ITEMS_PAR_PAGE, page * ITEMS_PAR_PAGE);
-
-	const handleOuvrirModal = useCallback((c) => setModalC(c), []);
 	const changer = (setter) => (val) => { setter(val); setPage(1); };
+
 	const allerPage = (p) => {
 		setPage(p);
 		document.getElementById("croisieres")?.scrollIntoView({ behavior: "smooth" });
@@ -168,6 +165,14 @@ export default function CroisieresSection() {
 									<X className="size-3" /> Réinitialiser
 								</button>
 							)}
+
+							{/* Compteur total */}
+							{!chargement && (
+								<span className="text-xs text-stone-400">
+									{total.toLocaleString("fr-CA")} croisières
+								</span>
+							)}
+
 							<div className="relative">
 								<select value={tri}
 									onChange={(e) => { setTri(e.target.value); setPage(1); }}
@@ -223,7 +228,7 @@ export default function CroisieresSection() {
 							<CarteCroisiere
 								key={`${c["Date Départ"]}-${c["Navire"]}-${i}`}
 								c={c}
-								onClick={handleOuvrirModal}
+								onClick={setModalC}
 							/>
 						))}
 					</div>

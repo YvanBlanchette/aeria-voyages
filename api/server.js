@@ -4,10 +4,6 @@ const Database = require("better-sqlite3");
 const path = require("path");
 const cheerio = require("cheerio");
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  CONFIGURATION
-// ─────────────────────────────────────────────────────────────────────────────
-
 const app = express();
 const PORT = 3001;
 const DB_PATH = path.join(__dirname, "..", "db", "aeria.db");
@@ -15,20 +11,14 @@ const DB_PATH = path.join(__dirname, "..", "db", "aeria.db");
 app.use(cors());
 app.use(express.json());
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  BASE DE DONNÉES
-// ─────────────────────────────────────────────────────────────────────────────
-
 const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
 db.pragma("busy_timeout = 5000");
 
-// Codes des ports américains chargés en mémoire au démarrage (lookup O(1))
 const US_PORTS = new Set(
 	db.prepare("SELECT code FROM ports WHERE est_usa = 1").all().map((r) => r.code),
 );
 
-// Fonction SQLite custom: retourne 1 si la croisière touche un port américain.
 db.function("has_us_port", (port_depart, ports_csv) => {
 	if (port_depart && US_PORTS.has(port_depart.trim())) return 1;
 	if (ports_csv) {
@@ -39,29 +29,19 @@ db.function("has_us_port", (port_depart, ports_csv) => {
 	return 0;
 });
 
-// Dictionnaire code → nom de port chargé en mémoire pour résolution côté serveur
 const PORT_NOMS = db.prepare("SELECT code, nom FROM ports").all()
 	.reduce((acc, r) => { acc[r.code] = r.nom; return acc; }, {});
 
-// Résout un code de port en nom lisible (ex: BGI → Barbados)
 function resoudrePort(code) {
 	if (!code || code === "N/A") return code;
 	const s = code.trim();
-	if (s.includes(" ") || s.includes(",")) return s; // déjà un nom lisible
+	if (s.includes(" ") || s.includes(",")) return s;
 	return PORT_NOMS[s] ?? s;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  UTILITAIRES
-// ─────────────────────────────────────────────────────────────────────────────
 
 function parseJSON(val) {
 	try { return JSON.parse(val); } catch { return val; }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  CONSTANTES — CIRCUITS VACANCES AIR CANADA (ACV)
-// ─────────────────────────────────────────────────────────────────────────────
 
 const ACV_DESTINATIONS = {
 	AMS: "Amsterdam", BCN: "Barcelone", BRU: "Bruxelles",
@@ -82,7 +62,6 @@ const ACV_VILLES = {
 //  ROUTES — CROISIÈRES
 // ─────────────────────────────────────────────────────────────────────────────
 
-// GET /api/ports — dictionnaire code → nom pour le front-end
 app.get("/api/ports", (req, res) => {
 	try {
 		const rows = db.prepare("SELECT code, nom FROM ports").all();
@@ -94,94 +73,110 @@ app.get("/api/ports", (req, res) => {
 	}
 });
 
-// GET /api/croisieres
-// Filtres: section, croisieriste, mois, annee, duree_min, duree_max, tri, exclude_usa
 app.get("/api/croisieres", (req, res) => {
 	try {
-		const { section, croisieriste, mois, annee, duree_min, duree_max, tri, exclude_usa } = req.query;
+		const { section, croisieriste, navire, mois, annee, duree_min, duree_max, tri, exclude_usa } = req.query;
 
 		let query = "SELECT * FROM mes_croisieres WHERE 1=1";
 		const params = [];
 
-		// Filtre "Aucun port américain"
 		if (exclude_usa === "true") {
 			query += " AND has_us_port(port_depart, ports) = 0";
 		}
-
 		if (section) {
 			query += " AND section = ?";
 			params.push(section);
 		}
-
+		if (req.query.destination) {
+			const liste = req.query.destination.split(",");
+			query += ` AND destination IN (${liste.map(() => "?").join(",")})`;
+			params.push(...liste);
+		}
 		if (croisieriste) {
 			const liste = croisieriste.split(",");
 			query += ` AND croisieriste IN (${liste.map(() => "?").join(",")})`;
 			params.push(...liste);
 		}
-
+		if (navire) {
+			const liste = navire.split(",");
+			query += ` AND navire IN (${liste.map(() => "?").join(",")})`;
+			params.push(...liste);
+		}
 		if (mois) {
 			query += " AND CAST(strftime('%m', date_depart) AS INTEGER) = ?";
 			params.push(parseInt(mois));
 		}
-
 		if (annee) {
 			query += " AND strftime('%Y', date_depart) = ?";
 			params.push(annee);
 		}
-
 		if (duree_min) {
 			query += " AND nuits >= ?";
 			params.push(parseInt(duree_min));
 		}
-
 		if (duree_max) {
 			query += " AND nuits <= ?";
 			params.push(parseInt(duree_max));
 		}
 
 		const tris = {
-			"date-asc":   "date_depart ASC",
-			"date-desc":  "date_depart DESC",
-			"prix-asc":   "MIN(COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), prix_balcon)) ASC",
-			"prix-desc":  "MIN(COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), prix_balcon)) DESC",
-			"duree-asc":  "nuits ASC",
-			"duree-desc": "nuits DESC",
+				"date-asc":   "date_depart ASC",
+				"date-desc":  "date_depart DESC",
+				"prix-asc":   "COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), NULLIF(prix_balcon,0)) ASC",
+				"prix-desc":  "COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), NULLIF(prix_balcon,0)) DESC",
+				"duree-asc":  "nuits ASC",
+				"duree-desc": "nuits DESC",
 		};
+
+		if (tri && tri.startsWith("prix")) {
+    	query += " AND (prix_int > 0 OR prix_ext > 0 OR prix_balcon > 0)";
+		}
+
 		query += ` ORDER BY ${tris[tri] || "date_depart ASC"}`;
+
+		const countQuery = query.replace(/^SELECT \*/, "SELECT COUNT(*) as total");
+		const { total } = db.prepare(countQuery).get(...params);
+
+		const limit  = Math.min(parseInt(req.query.limit) || 24, 100);
+		const offset = parseInt(req.query.offset) || 0;
+		query += ` LIMIT ? OFFSET ?`;
+		params.push(limit, offset);
 
 		const rows = db.prepare(query).all(...params);
 
-		res.json(rows.map((r) => ({
-			LienSEG: r.lien_seg,
+		const mapper = (r) => ({
+			LienSEG:               r.lien_seg,
 			...r,
-			Croisiériste:        r.croisieriste,
-			Navire:              r.navire,
-			"Date Départ":       r.date_depart,
-			"Date Retour":       r.date_retour,
-			Nuits:               r.nuits,
-			Itinéraire:          r.itineraire,
-			"Port Départ":       resoudrePort(r.port_depart),
-			Ports:               r.ports ? r.ports.split(",").filter(Boolean).map(resoudrePort) : [],
-			"Prix Int.":         r.prix_int,
-			"Prix Ext.":         r.prix_ext,
-			"Prix Balcon":       r.prix_balcon,
-			"Prix Vol MTL Int.": r.prix_vol_int,
-			"Prix Vol MTL Ext.": r.prix_vol_ext,
+			Croisiériste:          r.croisieriste,
+			Navire:                r.navire,
+			"Date Départ":         r.date_depart,
+			"Date Retour":         r.date_retour,
+			Nuits:                 r.nuits,
+			Itinéraire:            r.itineraire,
+			"Port Départ":         resoudrePort(r.port_depart),
+			Ports:                 r.ports ? r.ports.split(",").filter(Boolean).map(resoudrePort) : [],
+			"Prix Int.":           r.prix_int,
+			"Prix Ext.":           r.prix_ext,
+			"Prix Balcon":         r.prix_balcon,
+			"Prix Vol MTL Int.":   r.prix_vol_int,
+			"Prix Vol MTL Ext.":   r.prix_vol_ext,
 			"Prix Vol MTL Balcon": r.prix_vol_balcon,
-			Boissons:            r.boissons,
-			Pourboires:          r.pourboires,
-			WiFi:                r.wifi,
-			"Image Itinéraire":  r.image_itin,
-			"Image Navire":      r.image_navire,
-			Lien:                r.lien_constellation,
-			destination: r.destination,
-		})));
+			Boissons:              r.boissons,
+			Pourboires:            r.pourboires,
+			WiFi:                  r.wifi,
+			"Image Itinéraire":    r.image_itineraire,
+			"Image Navire":        r.image_navire,
+			Lien:                  r.lien_constellation,
+			destination:           r.destination,
+		});
+
+		res.json({ total, limit, offset, data: rows.map(mapper) });
+
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
 });
 
-// GET /api/croisieres/meta
 app.get("/api/croisieres/meta", (req, res) => {
 	try {
 		res.json({
@@ -190,6 +185,25 @@ app.get("/api/croisieres/meta", (req, res) => {
 			annees:     db.prepare("SELECT DISTINCT strftime('%Y', date_depart) as annee FROM mes_croisieres ORDER BY annee").all().map((r) => r.annee),
 			sections:   db.prepare("SELECT DISTINCT section FROM mes_croisieres").all().map((r) => r.section),
 		});
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+});
+
+app.get("/api/croisieres/navires", (req, res) => {
+	try {
+		const { croisieriste } = req.query;
+		let query = "SELECT DISTINCT navire FROM mes_croisieres WHERE navire IS NOT NULL";
+		const params = [];
+
+		if (croisieriste) {
+			const liste = croisieriste.split(",");
+			query += ` AND croisieriste IN (${liste.map(() => "?").join(",")})`;
+			params.push(...liste);
+		}
+
+		query += " ORDER BY navire ASC";
+		res.json(db.prepare(query).all(...params).map((r) => r.navire));
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
@@ -216,9 +230,9 @@ app.get("/api/circuits/exoticca", (req, res) => {
 			source:       "exoticca",
 			prixPromo:    r.prix_promo,
 			prixRegulier: r.prix_regulier,
-			rabais:       r.rabais_pourcentage,
+			rabais:       r.rabais_pct,
 			lienAgent:    r.lien_agent,
-			image:        r.image,
+			image:        r.image_url,
 			destination:  r.destination,
 			jours:        r.jours,
 		})));
@@ -237,28 +251,28 @@ app.get("/api/circuits/acv", (req, res) => {
 		let query = "SELECT * FROM circuits_acv WHERE 1=1";
 		const params = [];
 
-		if (destination)  { query += " AND destination = ?";       params.push(destination); }
-		if (ville_depart) { query += " AND departure_city = ?";    params.push(ville_depart); }
-		if (mois)         { query += " AND month = ?";             params.push(mois); }
-		if (duree)        { query += " AND duration_category = ?"; params.push(duree); }
-		query += " ORDER BY price ASC";
+		if (destination)  { query += " AND destination = ?";     params.push(destination); }
+		if (ville_depart) { query += " AND ville_depart = ?";    params.push(ville_depart); }
+		if (mois)         { query += " AND mois = ?";            params.push(mois); }
+		if (duree)        { query += " AND categorie_duree = ?"; params.push(duree); }
+		query += " ORDER BY prix ASC";
 
 		res.json(db.prepare(query).all(...params).map((r) => ({
 			...r,
 			source:          "acv",
-			titre:           r.name,
-			prixPromo:       r.price,
+			titre:           r.nom,
+			prixPromo:       r.prix,
 			prixRegulier:    null,
 			rabais:          null,
-			lienAgent:       r.tour_url?.replace("/en/", "/fr/").replace("distribution=yes&distribution=yes", "distribution=yes"),
+			lienAgent:       r.url_circuit?.replace("/en/", "/fr/").replace("distribution=yes&distribution=yes", "distribution=yes"),
 			image:           r.image_url,
-			jours:           r.days,
+			jours:           r.jours ?? r.days,
 			destinationCode: r.destination,
 			destinationNom:  ACV_DESTINATIONS[r.destination] ?? r.destination,
 			destination:     `${ACV_DESTINATIONS[r.destination] ?? r.destination} (${r.destination})`,
-			villeDepart:     ACV_VILLES[r.departure_city] ?? r.departure_city,
-			villedepartCode: r.departure_city,
-			lieux:           parseJSON(r.visited_locations),
+			villeDepart:     ACV_VILLES[r.ville_depart] ?? r.departure_city,
+			villedepartCode: r.ville_depart,
+			lieux:           parseJSON(r.lieux_visites),
 			region:          "europe",
 		})));
 	} catch (err) {
@@ -274,9 +288,9 @@ app.get("/api/circuits/acv/meta", (req, res) => {
 				nom:   ACV_DESTINATIONS[r.destination] ?? r.destination,
 				label: `${ACV_DESTINATIONS[r.destination] ?? r.destination} (${r.destination})`,
 			})),
-			villes: db.prepare("SELECT DISTINCT departure_city FROM circuits_acv ORDER BY departure_city").all().map((r) => ({
+			villes: db.prepare("SELECT DISTINCT departure_city FROM circuits_acv ORDER BY date_departure_city").all().map((r) => ({
 				code: r.departure_city,
-				nom:  ACV_VILLES[r.departure_city] ?? r.departure_city,
+				nom:  ACV_VILLES[r.ville_depart] ?? r.departure_city,
 			})),
 			mois:   db.prepare("SELECT DISTINCT month FROM circuits_acv ORDER BY month").all().map((r) => r.month),
 			durees: db.prepare("SELECT DISTINCT duration_category FROM circuits_acv ORDER BY duration_category").all().map((r) => r.duration_category),
@@ -301,15 +315,15 @@ app.get("/api/circuits/tripoppo", (req, res) => {
 
 		res.json(db.prepare(query).all(...params).map((r) => ({
 			...r,
-			source:           "tripoppo",
-			prixPromo:        parseFloat(r.prix_promo) || 0,
-			prixRegulier:     parseFloat(r.prix_regulier) || null,
-			lienAgent:        r.lien_agent ?? r.circuit_url,
-			image:            r.image_url,
-			infos_rapides:    parseJSON(r.infos_rapides),
-			images_carousel:  parseJSON(r.images_carousel),
-			inclus:           parseJSON(r.inclus),
-			non_inclus:       parseJSON(r.non_inclus),
+			source:          "tripoppo",
+			prixPromo:       parseFloat(r.prix_promo) || 0,
+			prixRegulier:    parseFloat(r.prix_regulier) || null,
+			lienAgent:       r.lien_agent ?? r.url_circuit,
+			image:           r.image_url,
+			infos_rapides:   parseJSON(r.infos_rapides),
+			images_carousel: parseJSON(r.images_carousel),
+			inclus:          parseJSON(r.inclus),
+			non_inclus:      parseJSON(r.non_inclus),
 		})));
 	} catch (err) {
 		res.status(500).json({ error: err.message });
@@ -321,20 +335,20 @@ app.get("/api/circuits/tripoppo/:id", (req, res) => {
 		const circuit = db.prepare("SELECT * FROM circuits_tripoppo WHERE id = ?").get(req.params.id);
 		if (!circuit) return res.status(404).json({ error: "Circuit introuvable" });
 
-		const itineraire = db.prepare("SELECT * FROM tripoppo_itineraire WHERE circuit_url = ? ORDER BY id").all(circuit.circuit_url)
+		const itineraire = db.prepare("SELECT * FROM tripoppo_itineraire WHERE url_circuit = ? ORDER BY id").all(circuit.url_circuit)
 			.map((j) => ({ ...j, images: parseJSON(j.images) }));
 
-		const dates_prix = db.prepare("SELECT * FROM tripoppo_dates_prix WHERE circuit_url = ? ORDER BY depart").all(circuit.circuit_url)
+		const dates_prix = db.prepare("SELECT * FROM tripoppo_dates_prix WHERE url_circuit = ? ORDER BY date_depart").all(circuit.url_circuit)
 			.map((d) => ({ ...d, liens_resa: parseJSON(d.liens_resa) }));
 
-		const hotels = db.prepare("SELECT * FROM tripoppo_hotels WHERE circuit_url = ?").all(circuit.circuit_url);
+		const hotels = db.prepare("SELECT * FROM tripoppo_hotels WHERE url_circuit = ?").all(circuit.url_circuit);
 
 		res.json({
 			...circuit,
 			source:          "tripoppo",
 			prixPromo:       parseFloat(circuit.prix_promo) || 0,
 			prixRegulier:    parseFloat(circuit.prix_regulier) || null,
-			lienAgent:       circuit.lien_agent ?? circuit.circuit_url,
+			lienAgent:       circuit.lien_agent ?? circuit.url_circuit,
 			image:           circuit.image_url,
 			infos_rapides:   parseJSON(circuit.infos_rapides),
 			images_carousel: parseJSON(circuit.images_carousel),
