@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, ChevronDown, Check } from "lucide-react";
-import { GOLD } from "./constants";
+import { GOLD } from "../../../../lib/constants/cruises-constants";
 
 export default function MultiSelect({ placeholder, options, selected, onChange, groups }) {
 	const [open, setOpen] = useState(false);

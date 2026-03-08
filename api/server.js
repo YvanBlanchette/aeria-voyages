@@ -3,10 +3,11 @@ const cors = require("cors");
 const Database = require("better-sqlite3");
 const path = require("path");
 const cheerio = require("cheerio");
-
 const app = express();
 const PORT = 3001;
 const DB_PATH = path.join(__dirname, "..", "db", "aeria.db");
+const createAllInclusiveRouter = require('./routes/all-inclusive');
+
 
 app.use(cors());
 app.use(express.json());
@@ -58,10 +59,6 @@ const ACV_VILLES = {
 	YOW: "Ottawa",
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  ROUTES — CROISIÈRES
-// ─────────────────────────────────────────────────────────────────────────────
-
 app.get("/api/ports", (req, res) => {
 	try {
 		const rows = db.prepare("SELECT code, nom FROM ports").all();
@@ -79,6 +76,8 @@ app.get("/api/croisieres", (req, res) => {
 
 		let query = "SELECT * FROM mes_croisieres WHERE 1=1";
 		const params = [];
+
+		query += " AND croisieriste != 'Carnival Cruise Line'";
 
 		if (exclude_usa === "true") {
 			query += " AND has_us_port(port_depart, ports) = 0";
@@ -120,16 +119,16 @@ app.get("/api/croisieres", (req, res) => {
 		}
 
 		const tris = {
-				"date-asc":   "date_depart ASC",
-				"date-desc":  "date_depart DESC",
-				"prix-asc":   "COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), NULLIF(prix_balcon,0)) ASC",
-				"prix-desc":  "COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), NULLIF(prix_balcon,0)) DESC",
-				"duree-asc":  "nuits ASC",
-				"duree-desc": "nuits DESC",
+			"date-asc":   "date_depart ASC",
+			"date-desc":  "date_depart DESC",
+			"prix-asc":   "COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), NULLIF(prix_balcon,0)) ASC",
+			"prix-desc":  "COALESCE(NULLIF(prix_int,0), NULLIF(prix_ext,0), NULLIF(prix_balcon,0)) DESC",
+			"duree-asc":  "nuits ASC",
+			"duree-desc": "nuits DESC",
 		};
 
 		if (tri && tri.startsWith("prix")) {
-    	query += " AND (prix_int > 0 OR prix_ext > 0 OR prix_balcon > 0)";
+			query += " AND (prix_int > 0 OR prix_ext > 0 OR prix_balcon > 0)";
 		}
 
 		query += ` ORDER BY ${tris[tri] || "date_depart ASC"}`;
@@ -147,12 +146,12 @@ app.get("/api/croisieres", (req, res) => {
 		const mapper = (r) => ({
 			LienSEG:               r.lien_seg,
 			...r,
-			Croisiériste:          r.croisieriste,
+			"Croisiériste":        r.croisieriste,
 			Navire:                r.navire,
 			"Date Départ":         r.date_depart,
 			"Date Retour":         r.date_retour,
 			Nuits:                 r.nuits,
-			Itinéraire:            r.itineraire,
+			"Itinéraire":          r.itineraire,
 			"Port Départ":         resoudrePort(r.port_depart),
 			Ports:                 r.ports ? r.ports.split(",").filter(Boolean).map(resoudrePort) : [],
 			"Prix Int.":           r.prix_int,
@@ -180,7 +179,7 @@ app.get("/api/croisieres", (req, res) => {
 app.get("/api/croisieres/meta", (req, res) => {
 	try {
 		res.json({
-			compagnies: db.prepare("SELECT DISTINCT croisieriste FROM mes_croisieres ORDER BY croisieriste").all().map((r) => r.croisieriste),
+			compagnies: db.prepare("SELECT DISTINCT croisieriste FROM mes_croisieres WHERE croisieriste != 'Carnival Cruise Line' ORDER BY croisieriste").all().map((r) => r.croisieriste),
 			mois:       db.prepare("SELECT DISTINCT CAST(strftime('%m', date_depart) AS INTEGER) as mois FROM mes_croisieres ORDER BY mois").all().map((r) => r.mois),
 			annees:     db.prepare("SELECT DISTINCT strftime('%Y', date_depart) as annee FROM mes_croisieres ORDER BY annee").all().map((r) => r.annee),
 			sections:   db.prepare("SELECT DISTINCT section FROM mes_croisieres").all().map((r) => r.section),
@@ -193,7 +192,7 @@ app.get("/api/croisieres/meta", (req, res) => {
 app.get("/api/croisieres/navires", (req, res) => {
 	try {
 		const { croisieriste } = req.query;
-		let query = "SELECT DISTINCT navire FROM mes_croisieres WHERE navire IS NOT NULL";
+		let query = "SELECT DISTINCT navire FROM mes_croisieres WHERE navire IS NOT NULL AND croisieriste != 'Carnival Cruise Line'";
 		const params = [];
 
 		if (croisieriste) {
@@ -208,10 +207,6 @@ app.get("/api/croisieres/navires", (req, res) => {
 		res.status(500).json({ error: err.message });
 	}
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  ROUTES — CIRCUITS EXOTICCA
-// ─────────────────────────────────────────────────────────────────────────────
 
 app.get("/api/circuits/exoticca", (req, res) => {
 	try {
@@ -240,10 +235,6 @@ app.get("/api/circuits/exoticca", (req, res) => {
 		res.status(500).json({ error: err.message });
 	}
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  ROUTES — CIRCUITS VACANCES AIR CANADA (ACV)
-// ─────────────────────────────────────────────────────────────────────────────
 
 app.get("/api/circuits/acv", (req, res) => {
 	try {
@@ -299,10 +290,6 @@ app.get("/api/circuits/acv/meta", (req, res) => {
 		res.status(500).json({ error: err.message });
 	}
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  ROUTES — CIRCUITS TRIPOPPO
-// ─────────────────────────────────────────────────────────────────────────────
 
 app.get("/api/circuits/tripoppo", (req, res) => {
 	try {
@@ -362,10 +349,6 @@ app.get("/api/circuits/tripoppo/:id", (req, res) => {
 		res.status(500).json({ error: err.message });
 	}
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  PROXY TRANSPARENT — VACANCES AIR CANADA
-// ─────────────────────────────────────────────────────────────────────────────
 
 const ACV_BASE = "https://vacations.aircanada.com";
 
@@ -465,14 +448,13 @@ app.get("/acv-proxy", async (req, res) => {
 	}
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  SANTÉ & DÉMARRAGE
-// ─────────────────────────────────────────────────────────────────────────────
-
 app.get("/api/health", (req, res) => res.json({ status: "ok", db: DB_PATH }));
+
+app.use('/api/all-inclusive', createAllInclusiveRouter(db));
 
 app.listen(PORT, () => {
 	console.log(`🚀 API Aeria Voyages démarrée sur le port ${PORT}`);
 	console.log(`📦 DB : ${DB_PATH}`);
 	console.log(`🇺🇸 Ports US chargés : ${US_PORTS.size} codes`);
 });
+

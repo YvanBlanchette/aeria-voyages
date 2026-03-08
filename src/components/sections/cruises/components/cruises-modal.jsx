@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { X, Ship, MessageCircle, Mail, ArrowLeft, Send, Loader2, ShipIcon, MapPin, Calendar, Building2 } from "lucide-react";
+import { X, Ship, MessageCircle, Mail, Send, Loader2, ShipIcon, MapPin, Calendar, Building2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import emailjs from "@emailjs/browser";
-import { GOLD, getPorts, fmtPeriode, buildMessengerUrl, getPrixMin } from "./constants";
+import { getPorts, fmtPeriode, buildMessengerUrl, getPrixMin, partagerCroisiere } from "../../../../lib/constants/cruises-constants";
 import { Share2 } from "lucide-react";
-import { partagerCroisiere } from "./constants";
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -62,7 +61,7 @@ export default function Modal({ c, onClose }) {
 			className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#E6DBC1]/50 backdrop-blur-sm"
 			onClick={(e) => e.target === e.currentTarget && onClose()}
 		>
-			<div className="relative w-full sm:max-w-xl bg-white overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200 rounded-sm">
+			<div className="relative w-full h-[90vh] sm:max-w-xl bg-white overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200 rounded-sm">
 				{!showForm ? (
 					<>
 						{/* ───── VUE DÉTAIL (inchangée) ─────*/}

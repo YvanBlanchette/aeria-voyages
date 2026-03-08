@@ -12,9 +12,10 @@ import logoSeabourn  from "/logos/seabourn.png";
 import logoExplora   from "/logos/explora.png";
 
 export const MESSENGER_URL      = "https://m.me/yvanblanchettecvc";
-export const COMPAGNIES_EXCLUES = new Set(["Carnival Cruise Line"]);
-export const ITEMS_PAR_PAGE     = 24;
-export const GOLD               = "#B8935C";
+export const ITEMS_PAR_PAGE     = 9;
+export const GOLD = "#B8935C";
+export const AI_API = "/api/all-inclusive";
+export const AI_ITEMS_PER_PAGE = 24;
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  DESTINATIONS
@@ -197,7 +198,6 @@ export function useCroisieresMeta() {
 
 	return {
 		OPTS_COMPAGNIES: (meta?.compagnies ?? [])
-			.filter((c) => !COMPAGNIES_EXCLUES.has(c))
 			.map((c) => ({ value: c, label: c })),
 		OPTS_DUREES: DUREES.map((d, i) => ({ value: String(i), label: d.label })),
 		OPTS_MOIS: (meta?.mois ?? [])
@@ -252,7 +252,7 @@ export function useCroisieres({
 		fetch(`/api/croisieres?${params.toString()}`)
 			.then((r) => r.json())
 			.then((json) => {
-				setCroisieres((json.data ?? []).filter((c) => !COMPAGNIES_EXCLUES.has(c["Croisiériste"])));
+				setCroisieres(json.data ?? []);
 				setTotal(json.total ?? 0);
 			})
 			.catch(console.error)
@@ -341,3 +341,38 @@ export function useNavires(fComps) {
 
 	return navires.map((n) => ({ value: n, label: n }));
 }
+
+export const AI_NUITS_OPTIONS = [
+  { value: "7",     label: "7 nuits" },
+  { value: "14",    label: "14 nuits" },
+  { value: "5-10",  label: "5–10 nuits" },
+  { value: "11-16", label: "11–16 nuits" },
+  { value: "3",     label: "3 nuits" },
+  { value: "4",     label: "4 nuits" },
+  { value: "5",     label: "5 nuits" },
+  { value: "6",     label: "6 nuits" },
+  { value: "10",    label: "10 nuits" },
+  { value: "21",    label: "21 nuits" },
+];
+
+export const AI_FLEX_OPTIONS = [
+  { value: "0", label: "Date exacte" },
+  { value: "1", label: "+/- 1 jour" },
+  { value: "2", label: "+/- 2 jours" },
+  { value: "3", label: "+/- 3 jours" },
+];
+
+export const ETOILES_OPTIONS = [
+  { value: "3", label: "3 étoiles" },
+  { value: "4", label: "4 étoiles" },
+  { value: "5", label: "5 étoiles" },
+];
+
+export const AI_TRI_OPTIONS = [
+  { value: "prix-asc",     label: "Prix croissant" },
+  { value: "prix-desc",    label: "Prix décroissant" },
+  { value: "etoiles-desc", label: "Étoiles (↓)" },
+  { value: "etoiles-asc",  label: "Étoiles (↑)" },
+  { value: "nom-asc",      label: "Nom A–Z" },
+];
+

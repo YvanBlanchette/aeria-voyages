@@ -38,15 +38,18 @@ export const testimonials = [
 export const navLinks = [
 	{ label: "Circuits", href: "#circuits", target: "", rel: "" },
 	{ label: "Croisières", href: "#croisieres", target: "", rel: "" },
+	{ label: "Forfaits Voyage", href: "#all-inclusives", target: "", rel: "" },
 	{ label: "Blogue", href: "https://blog.aeriavoyages.com/", target: "_blank", rel: "noopener noreferrer" },
-	{ label: "Nous Joindre", href: "#cta", target: "", rel: "" },
+	// { label: "Nous Joindre", href: "#cta", target: "", rel: "" },
 ];
 
 export const socialLinks = [
-	{ label: "Facebook", href: "https://www.facebook.com/yvanblanchettecvc", icon: "facebook" },
-	{ label: "Instagram", href: "https://www.instagram.com/yvanblanchettecvc", icon: "instagram" },
+	{ label: "facebook", href: "https://www.facebook.com/yvanblanchettecvc", icon: "facebook" },
+	{ label: "tnstagram", href: "https://www.instagram.com/yvanblanchettecvc", icon: "instagram" },
 	{ label: "youtube", href: "https://youtube.com/@yvanblanchettecvc", icon: "youtube" },
-	{ label: "Messenger", href: "https://www.m.me/yvanblanchettecvc", icon: "messenger" },
+	{ label: "messenger", href: "https://www.m.me/yvanblanchettecvc", icon: "messenger" },
+	{ label: "tiktok", href: "https://www.tiktok.com/aeriavoyages", icon: "tiktok" },
+	{ label: "x", href: "https://x.com/yblanchettecvc", icon: "x" },
 ];
 
 export const TYPES_VOYAGE = [

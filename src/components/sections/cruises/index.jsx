@@ -6,14 +6,14 @@ import {
 	GOLD, ITEMS_PAR_PAGE, DUREES, TRI_OPTIONS,
 	DESTINATION_LABELS, DESTINATION_GROUPES,
 	useCroisieres, useCroisieresMeta, useNavires,
-} from "./constants";
+} from "@/lib/constants/cruises-constants";
 import { X, Anchor, ChevronDown, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
-import MultiSelect from "./MultiSelect";
-import CarteCroisiere from "./CarteCroisiere";
-import Modal from "./Modal";
+import MultiSelect from "@/components/sections/cruises/components/multi-select";
+import CruiseCard from "@/components/sections/cruises/components/cruises-card";
+import Modal from "@/components/sections/cruises/components/cruises-modal";
 
 
 import { Separator } from "@/components/ui/separator";
@@ -225,7 +225,7 @@ const OPTS_NAVIRES = useNavires(fComps);
 				) : (
 					<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{affichees.map((c, i) => (
-							<CarteCroisiere
+							<CruiseCard
 								key={`${c["Date Départ"]}-${c["Navire"]}-${i}`}
 								c={c}
 								onClick={setModalC}

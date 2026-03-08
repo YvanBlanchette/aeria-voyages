@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Ship, MapPin, Calendar, ShipIcon, Share2 } from "lucide-react";
-import { GOLD, getPrixMin, fmtPeriode, partagerCroisiere } from "./constants";
+import { GOLD, getPrixMin, fmtPeriode, partagerCroisiere } from "../../../../lib/constants/cruises-constants";
 
 const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 	const prix = getPrixMin(c);

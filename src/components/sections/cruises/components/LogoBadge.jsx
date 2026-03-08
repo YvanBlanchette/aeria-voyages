@@ -1,4 +1,4 @@
-import { LOGOS_CONFIG } from "./constants";
+import { LOGOS_CONFIG } from "../../../../lib/constants/cruises-constants";
 
 export default function LogoBadge({ compagnie, size = "card" }) {
   const config = LOGOS_CONFIG[compagnie];

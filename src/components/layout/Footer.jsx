@@ -1,53 +1,58 @@
-import { Facebook, Instagram, Youtube, MessageCircle, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, IdCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import logoLight from "@/assets/images/aeria-logo-light.svg";
 import { socialLinks } from "@/lib/data";
+import acta from "@/assets/images/partner-logo/acta-light.svg"
+import aavq from "@/assets/images/partner-logo/aavq-light.svg"
+import clia from "@/assets/images/partner-logo/clia-light.svg"
+import ensemble from "@/assets/images/partner-logo/ensemble-logo-light.svg"
+import iataTids from "@/assets/images/partner-logo/iata-tids-light.svg"
+import opc from "@/assets/images/partner-logo/opc-light.svg"
+import { FaFacebook, FaFacebookMessenger, FaTiktok, FaYoutube, FaXTwitter  } from "react-icons/fa6";
+import { AiFillInstagram } from "react-icons/ai";
 
 // Mapping des icônes
 const iconMap = {
-	facebook: Facebook,
-	instagram: Instagram,
-	youtube: Youtube,
-	messenger: MessageCircle, // Ou Facebook si vous préférez
+	facebook: FaFacebook,
+	instagram: AiFillInstagram,
+	youtube: FaYoutube,
+	messenger: FaFacebookMessenger,
+	tiktok: FaTiktok,
+	x: FaXTwitter
 };
+
+
 
 const Footer = () => {
 	return (
 		<footer className="bg-dark text-white py-16 px-6">
 			<div className="max-w-7xl mx-auto">
-				<div className="flex justify-between gap-12 mb-12">
+				<div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-12 mb-12">
 					{/* Brand */}
-					<div>
+					<div className="flex flex-col items-center md:items-start">
 						<img
 							src={logoLight}
 							alt="ÆRIA Voyages"
 							className="h-10 w-auto mb-3"
 						/>
-						<p className="text-sm text-muted-foreground leading-relaxed mb-4 max-w-lg">
+						<p className="text-sm text-muted-foreground leading-relaxed mb-4 max-w-lg text-center md:text-left">
 							Croisières, aventures et découvertes aux quatre coins du monde. Parce que les plus beaux voyages se mesurent en connexions humaines. Explorez,
 							rêvez… laissez-vous porter vers de nouveaux horizons.
 						</p>
-						<div className="flex gap-4 mt-6">
+						<div className="flex gap-4 mt-4 items-center md:items-start">
 							{socialLinks.map((social) => {
 								const Icon = iconMap[social.icon];
 								return (
-									<Button
-										key={social.label}
-										asChild
-										variant="outline"
-										size="icon"
-										className="border-white/20 hover:border-gold text-gold hover:bg-gold hover:text-charcoal"
-									>
 										<a
 											href={social.href}
 											target="_blank"
 											rel="noopener noreferrer"
-											aria-label={social.label}
+										aria-label={social.label}
+										className="cursor-pointer group"
 										>
-											{Icon && <Icon className="size-[20px]" />}
+											{Icon && <Icon className="size-[20px] text-white opacity-80 group-hover:opacity-100" />}
 										</a>
-									</Button>
 								);
 							})}
 						</div>
@@ -60,9 +65,9 @@ const Footer = () => {
 							<li className="flex items-start gap-2">
 								<MapPin className="size-4 mt-1 shrink-0" />
 								<span>
-									1385 chemin Val des Lacs
+									400 - 3 Place Ville-Marie
 									<br />
-									Sainte-Sophie, QC J5J 2S8
+									Montréal (Québec) H3B 2E3, Canada
 								</span>
 							</li>
 							<li className="flex items-center gap-2">
@@ -83,11 +88,29 @@ const Footer = () => {
 									contact@aeriavoyages.com
 								</a>
 							</li>
+							<li className="flex items-center gap-2">
+								<IdCard className="size-4" />
+								<span text-xs>
+									Détenteur d'un Permis du Québec
+									<br />
+									#703666
+								</span>
+							</li>
 						</ul>
 					</div>
 				</div>
 
-				<Separator className="opacity-10" />
+
+				<div className="flex justify-between items-center gap-4 w-[90%] mx-auto">
+					<img className="block h-16 lg:h-10 w-full opacity-70" src={opc} alt="OPC logo" />
+					<img className="hidden lg:block h-10 w-full opacity-70" src={aavq} alt="AAVQ logo" />
+					<img className="hidden lg:block h-8 w-full opacity-70 ml-4" src={ensemble} alt="Ensemble logo" />
+					<img className="hidden lg:block h-10 w-full opacity-70" src={acta} alt="ACTA logo" />
+					<img className="hidden lg:block h-10 w-full opacity-70" src={clia} alt="CLIA logo" />
+					<img className="hidden lg:block h-10 w-full opacity-70" src={iataTids} alt="IATA logo | TIDS logo" />
+				</div>
+
+				<Separator className="opacity-10 mt-10" />
 
 				<div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
 					<p>© {new Date().getFullYear()} ÆRIA Voyages. Tous droits réservés.</p>

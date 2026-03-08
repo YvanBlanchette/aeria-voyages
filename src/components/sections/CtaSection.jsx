@@ -44,9 +44,7 @@ const CtaSection = () => {
 	}
 
 	return (
-		<section
-			id="cta"
-			className="relative py-24 px-6 bg-[#F5F2EB] text-charcoal overflow-hidden"
+		<section id="cta" className="py-20 px-6 bg-charcoal"
 		>
 			<img
 				src={icon}
