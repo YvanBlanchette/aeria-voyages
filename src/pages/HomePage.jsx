@@ -6,6 +6,7 @@ import MainLayout from "@/layouts/MainLayout";
 import AllInclusivesSection from "@/components/sections/all-inclusive";
 import TransfersSection from "@/components/sections/transfers";
 import FlightsSection from "@/components/sections/flights";
+import ESimSection from "@/components/sections/esim";
 
 const HomePage = () => {
 	return (
@@ -14,7 +15,8 @@ const HomePage = () => {
 			<CroisieresSection />
 			<TransfersSection />
 			<CircuitsSection />
-			<FlightsSection />
+			<ESimSection />
+			{/* <FlightsSection /> */}
 			<AllInclusivesSection />
 			{/* <CtaSection /> */}
 		</MainLayout>

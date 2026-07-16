@@ -1,45 +1,148 @@
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import FLLogo from "@/assets/images/flylooper.svg";
+import FlightsBackground from "@/assets/images/flight.jpg";
 
 const FlightsSection = () => {
+	const [isLoading, setIsLoading] = useState(true);
+	const [hasError, setHasError] = useState(false);
+
 	useEffect(() => {
+		const container = document.getElementById("flights-container");
+
+		if (!container) return;
+
+		container.innerHTML = "";
+
+		const params = new URLSearchParams({
+			currency: "cad",
+			trs: "550981",
+			shmarker: "751591",
+			show_hotels: "false",
+			searchUrl: "www.aviasales.fr",
+			locale: "fr",
+			default_origin: "YUL",
+			stops: "any",
+			powered_by: "false",
+			border_radius: "0",
+			plain: "true",
+			color_button: "#C99543",
+			color_button_text: "#FFFFFF",
+			color_focused: "#C99543",
+			color_icons: "#C99543",
+			primary_override: "#C99543",
+			secondary: "#FFFFFF",
+			dark: "#262626",
+			light: "#FFFFFF",
+			special: "#FFFFFF",
+			no_labels: "true",
+			promo_id: "7879",
+			campaign_id: "100",
+		});
+
 		const script = document.createElement("script");
-		script.src =
-			"https://tpembd.com/content?currency=cad&trs=16765&shmarker=185717.Aeria&show_hotels=false&powered_by=false&locale=fr&searchUrl=go.flylooper.com%2Fflights&primary_override=%2332a8dd&color_button=%233EB5ECff&color_icons=%233254DDff&dark=%23262626&light=%23FFFFFF&secondary=%23FFFFFF&special=%23C4C4C4&color_focused=%233267DDff&border_radius=0&no_labels=&plain=true&origin=YUL&promo_id=7879&campaign_id=100";
+
+		script.src = `https://tpwdg.com/content?${params.toString()}`;
 		script.async = true;
 		script.charset = "utf-8";
-		document.getElementById("flights-container")?.appendChild(script);
+		script.onload = () => {
+			setIsLoading(false);
+		};
+		script.onerror = () => {
+			setIsLoading(false);
+			setHasError(true);
+		};
 
-		return () => script.remove(); // cleanup
+		container.appendChild(script);
+
+		return () => {
+			container.innerHTML = "";
+		};
 	}, []);
 
 	return (
 		<section
 			id="flights"
-			className="py-16 px-6 relative flex justify-center gap-10 items-center h-full w-full ratio-video rounded-md min-h-[80vh]"
-			style={{ backgroundImage: "url('/src/assets/images/flight.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
+			className="relative isolate overflow-hidden bg-stone-950"
 		>
-			<div className="bg-black/15 absolute inset-0" />
-			<div className="max-w-7xl mx-auto flex md:flex-row flex-col md:justify-center gap-12 items-center w-full h-full z-10">
-				<div className="flex flex-col gap-3 items-center md:items-left w-[50%] mr-8">
+			{/* Image de fond */}
+			<img
+				src={FlightsBackground}
+				alt=""
+				aria-hidden="true"
+				className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
+			/>
+
+			{/* Overlays pour la lisibilité */}
+			<div className="absolute inset-0 -z-10 bg-stone-950/30" />
+			<div className="absolute inset-0 -z-10 bg-gradient-to-r from-stone-950/90 via-stone-950/55 to-stone-950/20" />
+			<div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-stone-950/45 to-transparent" />
+
+			<div className="mx-auto grid min-h-[680px] max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[1fr_1.05fr] lg:px-8">
+				{/* Contenu éditorial */}
+				<div className="max-w-xl text-center lg:text-left">
 					<img
 						src={FLLogo}
-						alt="Welcome Pickups"
-						className="w-125"
+						alt="FlyLooper"
+						className="mx-auto mb-8 h-auto w-72 object-contain lg:mx-0"
 					/>
-					<h2 className="hidden md:block text-4xl sm:text-5xl text-white font-black ml-14">
+
+					<p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-[#F6A707]">Comparateur de vols</p>
+
+					<h2 className="text-balance text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">
 						Voyagez plus.
-						<br />
-						<span className="text-[#F6A707] block mt-3">Payez moins.</span>
+						<span className="mt-1 block text-[#F6A707]">Payez moins.</span>
 					</h2>
-					<p className="hidden md:block text-2xl font-medium text-stone-50 md:ml-8">Les meilleurs prix sur le marché !</p>
+
+					<p className="mt-6 max-w-lg text-lg leading-8 text-white/85 sm:text-xl">
+						Comparez les itinéraires, les horaires et les tarifs pour trouver le vol qui correspond réellement à votre voyage.
+					</p>
+
+					<div className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-white/90 lg:justify-start">
+						<span>✓ Comparaison rapide</span>
+						<span>✓ Vols internationaux</span>
+						<span>✓ Meilleurs prix</span>
+					</div>
 				</div>
-				<div
-					id="flights-container"
-					className="shadow-sm"
-				/>
+
+				{/* Widget de recherche */}
+				<div className="w-full lg:justify-self-end">
+					<div className="mx-auto w-full max-w-[620px] rounded-2xl border border-white/20 bg-white/95 p-4 shadow-2xl shadow-black/35 backdrop-blur-md sm:p-6">
+						<div className="mb-5 border-b border-stone-200 pb-4">
+							<p className="text-sm font-semibold uppercase tracking-wider text-[#B47828]">Rechercher un vol</p>
+							<p className="mt-1 text-sm text-stone-500">Comparez les options disponibles pour votre prochaine destination.</p>
+						</div>
+
+						<div className="relative min-h-[310px] w-full">
+							<div
+								id="flights-container"
+								className="min-h-[310px] w-full"
+							/>
+
+							{isLoading && (
+								<div className="absolute inset-0 z-10 rounded-xl bg-white/90 p-4">
+									<div className="h-full animate-pulse">
+										<div className="mb-4 h-3 w-32 rounded-full bg-stone-200" />
+										<div className="mb-3 h-10 w-full rounded-md bg-stone-200" />
+										<div className="mb-3 h-10 w-full rounded-md bg-stone-200" />
+										<div className="mb-4 h-10 w-2/3 rounded-md bg-stone-200" />
+										<div className="h-9 w-40 rounded-md bg-amber-200" />
+									</div>
+									<p className="mt-4 text-sm font-medium text-stone-600">Chargement du widget de vols...</p>
+								</div>
+							)}
+
+							{hasError && !isLoading && (
+								<div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/90 px-4 text-center text-sm text-red-600">
+									Impossible de charger le widget pour le moment.
+								</div>
+							)}
+						</div>
+
+						<p className="mt-4 text-xs text-center leading-5 text-stone-500">
+							Les tarifs et disponibilités sont fournis par nos partenaires de réservation et peuvent varier au moment de l’achat.
+						</p>
+					</div>
+				</div>
 			</div>
 		</section>
 	);
