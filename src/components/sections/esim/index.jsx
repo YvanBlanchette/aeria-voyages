@@ -26,7 +26,7 @@ const ESimSection = () => {
 			secondary: "#FFFFFF",
 			dark: "#11100F",
 			light: "#FFFFFF",
-			special: "##fafaf9",
+			special: "#fafaf9",
 			border_radius: "8",
 			plain: "true",
 			no_labels: "true",
