@@ -27,3 +27,6 @@ app/generated
 db/croisieres.db
 db/croisieres.db-shm
 db/croisieres.db-wal
+
+.env
+.enc.local
