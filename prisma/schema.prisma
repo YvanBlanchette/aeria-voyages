@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model migrations {
+  filename   String?   @id
+  applied_at DateTime? @default(now())
+
+  @@map("_migrations")
+  @@ignore
+}
+
+/// cache_key/id/etc below are declared TEXT PRIMARY KEY in SQLite, which (unlike
+/// INTEGER PRIMARY KEY) does not imply NOT NULL — introspection flags these as
+/// nullable and @@ignore's them. Verified 0 NULLs across every row in these PK
+/// columns (see migration notes), so the nullability is asserted away by hand
+/// rather than migrating the live DB schema.
+model ai_search_cache {
+  cache_key  String @id
+  data       String
+  created_at String @default("datetime('now')")
+}
+
+model circuits_acv {
+  id              String  @id
+  nom             String?
+  ville_depart    String?
+  destination     String?
+  mois            String?
+  categorie_duree String?
+  prix            Float?
+  jours           Int?
+  nuits           Int?
+  image_url       String?
+  url_circuit     String?
+  lieux_visites   String?
+  derniere_maj    String?
+
+  @@index([prix], map: "idx_acv_price")
+  @@index([ville_depart], map: "idx_acv_departure_city")
+  @@index([mois], map: "idx_acv_month")
+  @@index([destination], map: "idx_acv_destination")
+}
+
+model circuits_exoticca {
+  id               String    @id
+  region           String?
+  destination      String?
+  titre            String?
+  jours            Int?
+  prix_promo       Float?
+  prix_regulier    Float?
+  economie         Float?
+  rabais_pct       String?
+  image_url        String?
+  lien_agent       String?
+  est_vente_eclair Boolean?
+  est_nouveau      Boolean?
+  derniere_maj     DateTime? @default(now())
+}
+
+model circuits_tripoppo {
+  id               Int       @id @default(autoincrement())
+  region           String?
+  titre            String?
+  sous_titre       String?
+  duree            String?
+  code_voyage      String?
+  prix_promo       String?
+  prix_regulier    String?
+  badge            String?
+  description      String?
+  infos_rapides    String?
+  url_circuit      String?   @unique(map: "sqlite_autoindex_circuits_tripoppo_1")
+  image_url        String?
+  images_carousel  String?
+  carte_itineraire String?
+  pdf_itineraire   String?
+  inclus           String?
+  non_inclus       String?
+  derniere_maj     DateTime? @default(now())
+}
+
+model croisieristes {
+  id              Int     @id @default(autoincrement())
+  nom             String  @unique(map: "sqlite_autoindex_croisieristes_1")
+  nom_court       String?
+  siege_social    String?
+  annee_fondation Int?
+  nb_navires      Int?
+  site_web        String?
+  description     String?
+  logo_url        String?
+  lien_source     String?
+  scrape_ok       Int?    @default(0)
+  scrape_date     String? @default("date('now')")
+  donnees_brutes  String?
+
+  @@index([nom], map: "idx_croisieristes_nom")
+}
+
+model mes_croisieres {
+  id                 Int       @id @default(autoincrement())
+  croisieriste       String?
+  navire             String?
+  date_depart        String?
+  date_retour        String?
+  nuits              Int?
+  itineraire         String?
+  port_depart        String?
+  ports              String?
+  prix_int           Float?
+  prix_ext           Float?
+  prix_balcon        Float?
+  prix_vol_int       Float?
+  prix_vol_ext       Float?
+  prix_vol_balcon    Float?
+  boissons           String?
+  pourboires         String?
+  wifi               String?
+  image_itineraire   String?
+  image_navire       String?
+  lien_constellation String?
+  lien_seg           String?
+  section            String?
+  derniere_maj       DateTime? @default(now())
+  destination        String?
+
+  @@index([destination], map: "idx_croisieres_destination")
+}
+
+model navires {
+  id                 Int     @id @default(autoincrement())
+  nom                String  @unique(map: "sqlite_autoindex_navires_1")
+  croisieriste       String?
+  annee_construction Int?
+  annee_renovation   Int?
+  chantier_naval     String?
+  pavillon           String?
+  tonnage            Int?
+  longueur_m         Float?
+  largeur_m          Float?
+  vitesse_noeuds     Float?
+  nb_ponts           Int?
+  nb_passagers       Int?
+  nb_passagers_max   Int?
+  nb_equipage        Int?
+  nb_cabines         Int?
+  image_url          String?
+  description        String?
+  lien_source        String?
+  scrape_ok          Int?    @default(0)
+  scrape_date        String? @default("date('now')")
+  donnees_brutes     String?
+  statut             String?
+  scrape_statut      String? @default("inconnu")
+
+  @@index([nom], map: "idx_navires_nom")
+}
+
+model ports {
+  code    String @id
+  nom     String
+  region  String?
+  pays    String?
+  iso     String?
+  lat     Float?
+  lng     Float?
+  est_usa Int    @default(0)
+
+  @@index([iso], map: "idx_ports_iso")
+  @@index([est_usa], map: "idx_ports_est_usa")
+}
+
+model seg_mapping {
+  nom_navire       String  @id
+  navire_id        String?
+  croisieriste_id  String?
+  nom_croisieriste String?
+  itineraires_json String?
+}
+
+model seg_name_corrections {
+  ship_name_constellation String @id
+  ship_name_seg           String
+}
+
+model tripoppo_dates_prix {
+  id             Int     @id @default(autoincrement())
+  url_circuit    String?
+  date_depart    String?
+  date_retour    String?
+  prix_terrestre String?
+  prix_package   String?
+  liens_resa     String?
+}
+
+model tripoppo_hotels {
+  id          Int     @id @default(autoincrement())
+  url_circuit String?
+  nom         String?
+  nuits       String?
+  description String?
+  image_url   String?
+}
+
+model tripoppo_itineraire {
+  id          Int     @id @default(autoincrement())
+  url_circuit String?
+  jour        String?
+  titre       String?
+  description String?
+  images      String?
+}
