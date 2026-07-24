@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cachedJson } from "@/lib/api-utils";
 
 export async function GET(request) {
 	try {
@@ -21,7 +22,7 @@ export async function GET(request) {
 			orderBy: { navire: "asc" },
 		});
 
-		return NextResponse.json(rows.map((r) => r.navire));
+		return cachedJson(rows.map((r) => r.navire));
 	} catch (err) {
 		return NextResponse.json({ error: err.message }, { status: 500 });
 	}

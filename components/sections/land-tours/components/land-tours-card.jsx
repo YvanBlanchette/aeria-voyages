@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ChevronRight, MapPin, Calendar, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -22,11 +23,17 @@ const LandToursCard = ({ tour }) => {
     <a href={lien} target="_blank" rel="noopener noreferrer"
       className="destination-card group block overflow-hidden transition-all duration-700 hover:shadow-[0_30px_60px_rgba(0,0,0,0.15)]"
     >
-      <Card className="overflow-hidden border-none h-full rounded-md aspect-square">
-        <div className="relative overflow-hidden min-h-84 h-full w-auto">
-          <img src={image} alt={titre}
-            className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+      <Card className="overflow-hidden border-none h-full rounded-2xl aspect-square">
+        <div className="relative overflow-hidden min-h-84 h-full w-auto bg-stone-200">
+          {image && (
+            <Image
+              src={image}
+              alt={titre}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          )}
           <div className="destination-overlay" />
           {rabais && (
             <div className="absolute top-4 start-4 z-10">

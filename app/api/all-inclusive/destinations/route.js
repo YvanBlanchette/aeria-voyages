@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { DESTINATIONS } from "@/lib/all-inclusive";
+import { cachedJson } from "@/lib/api-utils";
 
 export async function GET() {
-	return NextResponse.json(DESTINATIONS);
+	return cachedJson(DESTINATIONS);
 }

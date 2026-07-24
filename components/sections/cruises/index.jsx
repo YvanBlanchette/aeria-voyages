@@ -2,10 +2,10 @@
 
 // Ligne des imports React — retire useMemo
 import { useState, useCallback } from "react";
+import { motion } from "framer-motion";
 
 // Ligne des imports constants — ajoute useNavires
 import {
-	GOLD,
 	ITEMS_PAR_PAGE,
 	DUREES,
 	TRI_OPTIONS,
@@ -16,16 +16,14 @@ import {
 	useNavires,
 } from "@/lib/constants/cruises-constants";
 import { X, Anchor, ChevronDown, Loader2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 import MultiSelect from "@/components/sections/cruises/components/multi-select";
 import CruiseCard from "@/components/sections/cruises/components/cruises-card";
 import Modal from "@/components/sections/cruises/components/cruises-modal";
+import SectionHeader from "@/components/sections/SectionHeader";
 
-import { Separator } from "@/components/ui/separator";
-
-export default function CroisieresSection() {
+export default function CroisieresSection({ initialData, initialMeta }) {
 	const [modalC, setModalC] = useState(null);
 	const [page, setPage] = useState(1);
 	const [fDests, setFDests] = useState([]);
@@ -38,7 +36,7 @@ export default function CroisieresSection() {
 	const [excludeUSA, setExcludeUSA] = useState(false);
 
 	// Options de filtres — chargées une seule fois
-	const { OPTS_DEST, OPTS_COMPAGNIES, OPTS_DUREES, OPTS_MOIS, OPTS_ANNEES } = useCroisieresMeta();
+	const { OPTS_DEST, OPTS_COMPAGNIES, OPTS_DUREES, OPTS_MOIS, OPTS_ANNEES } = useCroisieresMeta(initialMeta);
 
 	// Données paginées — rechargées à chaque changement de filtre/page
 	const {
@@ -56,6 +54,7 @@ export default function CroisieresSection() {
 		tri,
 		page,
 		limit: ITEMS_PAR_PAGE,
+		initialData,
 	});
 
 	const nbPages = Math.ceil(total / ITEMS_PAR_PAGE);
@@ -100,29 +99,26 @@ export default function CroisieresSection() {
 		>
 			<div className="max-w-7xl mx-auto">
 				{/* En-tête */}
-				<div className="text-center mb-14 px-4 lg:px-0">
-					<Badge
-						variant="outline"
-						className="text-xs tracking-[0.4em] uppercase mb-4 rounded-full"
-						style={{ borderColor: GOLD, color: GOLD }}
-					>
-						DES OFFRES INCROYABLES
-					</Badge>
-					<h2 className="font-serif text-4xl lg:text-5xl font-semibold text-stone-900">Croisières Maritimes</h2>
-					<p className="text-stone-400 tracking-wide mt-4 text-xs max-w-lg mx-auto">
-						Les prix sont à{" "}
-						<b>
-							<u>titre indicatif seulement</u>
-						</b>
-						, par personne basé sur une occupation double et les taxes sont incluses. Communiquez avec moi pour obtenir le tarif exact et à jour ainsi que pour
-						réserver votre prochaine croisière.
-					</p>
-					<Separator className="w-20 h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-10" />
+				<div className="px-4 lg:px-0">
+					<SectionHeader
+						eyebrow="Des offres incroyables"
+						title="Croisières Maritimes"
+						description={
+							<>
+								Prix à{" "}
+								<b>
+									<u>titre indicatif seulement</u>
+								</b>
+								, par personne, occupation double, taxes incluses. Communiquez avec moi pour le tarif exact et pour réserver.
+							</>
+						}
+					/>
 				</div>
 
 				{/* Filtres */}
-				<div className="px-4 lg:px-0 mb-8 space-y-3">
-					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+				<div className="px-4 lg:px-0 mb-8">
+					<div className="bg-white rounded-2xl border border-stone-200/70 shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-4 lg:p-5 space-y-3">
+						<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
 						<MultiSelect
 							placeholder="Destination"
 							options={OPTS_DEST}
@@ -178,7 +174,7 @@ export default function CroisieresSection() {
 							/>
 							<div
 								className={`w-4 h-4 border flex items-center justify-center transition-colors
-								${excludeUSA ? "border-[#B8935C] bg-[#B8935C]" : "border-stone-300 bg-white group-hover:border-[#B8935C]"}`}
+								${excludeUSA ? "border-gold bg-gold" : "border-stone-300 bg-white group-hover:border-gold"}`}
 							>
 								{excludeUSA && (
 									<svg
@@ -203,8 +199,7 @@ export default function CroisieresSection() {
 							{filtresActifs && (
 								<button
 									onClick={reset}
-									className="cursor-pointer flex items-center gap-1.5 text-xs font-medium hover:opacity-70 transition-opacity"
-									style={{ color: GOLD }}
+									className="cursor-pointer flex items-center gap-1.5 text-xs font-medium text-gold hover:opacity-70 transition-opacity"
 								>
 									<X className="size-3" /> Réinitialiser
 								</button>
@@ -220,7 +215,7 @@ export default function CroisieresSection() {
 										setTri(e.target.value);
 										setPage(1);
 									}}
-									className="appearance-none text-sm pl-3 w-[160px] pr-8 py-2.5 border border-stone-200 bg-white text-stone-700 hover:border-stone-300 focus:outline-none focus:border-[#B8935C] transition-colors duration-200 cursor-pointer"
+									className="appearance-none text-sm pl-3 w-[160px] pr-8 py-2.5 border border-stone-200 bg-white text-stone-700 hover:border-stone-300 focus:outline-none focus:border-gold transition-colors duration-200 cursor-pointer"
 								>
 									{TRI_OPTIONS.map((o) => (
 										<option
@@ -242,8 +237,7 @@ export default function CroisieresSection() {
 							{fDests.map((d) => (
 								<span
 									key={d}
-									className="inline-flex items-center gap-1.5 text-xs px-3 py-1 border"
-									style={{ borderColor: GOLD, color: GOLD }}
+									className="inline-flex items-center gap-1.5 text-xs px-3 py-1 border border-gold text-gold rounded-full"
 								>
 									{DESTINATION_LABELS[d]}
 									<button
@@ -260,6 +254,7 @@ export default function CroisieresSection() {
 						</div>
 					)}
 				</div>
+				</div>
 
 				{/* Contenu */}
 				{chargement ? (
@@ -273,14 +268,19 @@ export default function CroisieresSection() {
 						<p className="text-stone-400 font-medium text-lg">Aucune croisière pour ces filtres.</p>
 						<button
 							onClick={reset}
-							className="mt-4 text-sm font-medium hover:opacity-70 transition-opacity"
-							style={{ color: GOLD }}
+							className="mt-4 text-sm font-medium text-gold hover:opacity-70 transition-opacity"
 						>
 							Réinitialiser les filtres
 						</button>
 					</div>
 				) : (
-					<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+					<motion.div
+						key={page}
+						initial={{ opacity: 0, y: 16 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5, ease: "easeOut" }}
+						className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+					>
 						{affichees.map((c, i) => (
 							<CruiseCard
 								key={`${c["Date Départ"]}-${c["Navire"]}-${i}`}
@@ -288,7 +288,7 @@ export default function CroisieresSection() {
 								onClick={setModalC}
 							/>
 						))}
-					</div>
+					</motion.div>
 				)}
 
 				{/* Pagination */}

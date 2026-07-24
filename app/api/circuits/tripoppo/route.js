@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { parseJSON } from "@/lib/api-utils";
+import { parseJSON, cachedJson } from "@/lib/api-utils";
 
 export async function GET(request) {
 	try {
@@ -12,7 +12,7 @@ export async function GET(request) {
 			orderBy: [{ region: "asc" }, { titre: "asc" }],
 		});
 
-		return NextResponse.json(rows.map((r) => ({
+		return cachedJson(rows.map((r) => ({
 			...r,
 			source: "tripoppo",
 			prixPromo: parseFloat(r.prix_promo) || 0,

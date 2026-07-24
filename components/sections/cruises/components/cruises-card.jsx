@@ -1,8 +1,9 @@
 "use client";
 
 import { memo } from "react";
+import Image from "next/image";
 import { Ship, MapPin, Calendar, ShipIcon, Share2 } from "lucide-react";
-import { GOLD, getPrixMin, fmtPeriode, partagerCroisiere } from "../../../../lib/constants/cruises-constants";
+import { getPrixMin, fmtPeriode, partagerCroisiere } from "../../../../lib/constants/cruises-constants";
 
 const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 	const prix = getPrixMin(c);
@@ -10,30 +11,19 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 	return (
 		<button
 			onClick={() => onClick(c)}
-			className="group text-left flex flex-col  overflow-hidden bg-white cursor-pointer w-full rounded-sm"
-			style={{
-				boxShadow: "0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)",
-				transition: "box-shadow 0.4s ease, transform 0.4s ease",
-			}}
-			onMouseEnter={(e) => {
-				e.currentTarget.style.boxShadow = "0 20px 60px rgba(184,147,92,0.18), 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(184,147,92,0.2)";
-				e.currentTarget.style.transform = "translateY(-4px)";
-			}}
-			onMouseLeave={(e) => {
-				e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)";
-				e.currentTarget.style.transform = "translateY(0)";
-			}}
+			className="card-lift group text-left flex flex-col overflow-hidden bg-white cursor-pointer w-full rounded-2xl"
 		>
 			{/* ── Image itinéraire (map) — propre, sans miniature ── */}
 			<div
 				className="relative overflow-hidden"
 				style={{ height: "250px" }}
 			>
-				<img
+				<Image
 					src={c["Image Itinéraire"]}
 					alt={c["Itinéraire"]}
-					className="w-full h-full object-cover"
-					loading="lazy"
+					fill
+					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+					className="object-cover transition-transform duration-700 group-hover:scale-105"
 					onError={(e) => {
 						e.target.style.display = "none";
 					}}
@@ -75,7 +65,7 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 				{/* Titre + image navire côte à côte */}
 				<div className=" flex items-start justify-between gap-3">
 					<div className="min-w-0">
-						<h3 className="font-serif text-xl mb-1 leading-tight text-stone-900 group-hover:text-[#B8935C] transition-colors duration-300">
+						<h3 className="font-serif text-xl mb-1 leading-tight text-stone-900 group-hover:text-gold transition-colors duration-300">
 							{c["Itinéraire"]}
 						</h3>
 						{/* Infos départ */}
@@ -104,19 +94,15 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 					{/* Image navire */}
 					{c["Image Navire"] && (
 						<div
-							className="shrink-0 overflow-hidden rounded-sm"
-							style={{
-								width: 120,
-								height: 78,
-								border: "1.5px solid rgba(184,147,92,0.25)",
-								boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
-							}}
+							className="relative shrink-0 overflow-hidden rounded-lg border-[1.5px] border-gold/25 shadow-[0_2px_8px_rgba(0,0,0,0.12)]"
+							style={{ width: 120, height: 78 }}
 						>
-							<img
+							<Image
 								src={c["Image Navire"]}
 								alt={c["Navire"]}
-								className="w-full h-full object-cover"
-								loading="lazy"
+								fill
+								sizes="120px"
+								className="object-cover"
 								onError={(e) => {
 									e.target.parentElement.style.display = "none";
 								}}
@@ -126,22 +112,12 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 				</div>
 
 				{/* Séparateur doré */}
-				<div
-					className="h-px w-full"
-					style={{
-						background: "linear-gradient(to right, transparent, rgba(184,147,92,0.3), transparent)",
-					}}
-				/>
+				<div className="h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
 
 				{/* Prix + pills */}
 				<div className="flex items-end justify-between gap-2">
 					<div>
-						<p
-							className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-1"
-							style={{ color: `${GOLD}99` }}
-						>
-							À partir de
-						</p>
+						<p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-1 text-gold/60">À partir de</p>
 						<div className="flex items-baseline gap-1">
 							<span className="text-2xl font-bold text-stone-900">{prix.toLocaleString("fr-CA")} $</span>
 							<span className="text-xs text-stone-400">/ pers.</span>
@@ -150,38 +126,17 @@ const CarteCroisiere = memo(function CarteCroisiere({ c, onClick }) {
 
 					<div className="flex flex-wrap gap-1 justify-end">
 						{c["Prix Int."] > 0 && (
-							<span
-								className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-								style={{
-									background: "rgba(184,147,92,0.07)",
-									color: `${GOLD}cc`,
-									border: `1px solid rgba(184,147,92,0.15)`,
-								}}
-							>
+							<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gold/[0.07] text-gold/80 border border-gold/15">
 								Int. {c["Prix Int."].toLocaleString("fr-CA")} $
 							</span>
 						)}
 						{c["Prix Ext."] > 0 && (
-							<span
-								className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-								style={{
-									background: "rgba(184,147,92,0.07)",
-									color: `${GOLD}cc`,
-									border: `1px solid rgba(184,147,92,0.15)`,
-								}}
-							>
+							<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gold/[0.07] text-gold/80 border border-gold/15">
 								Ext. {c["Prix Ext."].toLocaleString("fr-CA")} $
 							</span>
 						)}
 						{c["Prix Balcon"] > 0 && (
-							<span
-								className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-								style={{
-									background: "rgba(184,147,92,0.07)",
-									color: `${GOLD}cc`,
-									border: `1px solid rgba(184,147,92,0.15)`,
-								}}
-							>
+							<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gold/[0.07] text-gold/80 border border-gold/15">
 								Bal. {c["Prix Balcon"].toLocaleString("fr-CA")} $
 							</span>
 						)}

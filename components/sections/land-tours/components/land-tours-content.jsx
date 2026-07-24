@@ -1,20 +1,24 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VISIBLE_COUNT } from "@/lib/constants/land-tours-constants";
 import { FiltresACV, FiltresRegion } from "@/components/sections/land-tours/components/land-tours-filtres";
 import LandToursCard from "@/components/sections/land-tours/components/land-tours-card";
 
-const LandToursContent = ({ source }) => {
-	const [data, setData]                 = useState([]);
-	const [chargement, setChargement]     = useState(true);
+const LandToursContent = ({ source, initialData }) => {
+	const [data, setData]                 = useState(initialData ?? []);
+	const [chargement, setChargement]     = useState(!initialData);
 	const [activeRegion, setActiveRegion] = useState("all");
 	const [acvFilters, setAcvFilters]     = useState({});
 	const [showAll, setShowAll]           = useState(false);
+	const hasFetched = useRef(false);
 
 	useEffect(() => {
+		if (!hasFetched.current && initialData) return; // déjà pré-rempli côté serveur
+		hasFetched.current = true;
+
 		setChargement(true);
 		setData([]);
 		setActiveRegion("all");

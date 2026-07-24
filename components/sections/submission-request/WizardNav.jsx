@@ -10,19 +10,14 @@ export default function WizardNav({ step, status, onPrev, onNext, onSubmit, show
 		<div className="mt-8 pt-8 border-t border-[rgba(184,147,92,0.15)]">
 			<div className="flex items-center justify-between">
 				{step === 1 ? (
-					<button
-						aschild
-						className="lg:w-[165px] cursor-pointer px-8 py-3 font-raleway text-xs tracking-widest uppercase text-white rounded-sm shadow transition hover:brightness-110"
+					<a
+						href="/"
+						className="lg:w-[165px] cursor-pointer px-8 py-3 font-raleway text-xs tracking-widest uppercase text-white rounded-sm shadow transition hover:brightness-110 flex items-center justify-center gap-1"
 						style={{ background: GOLD }}
 					>
-						<a
-							href="/"
-							className="flex items-center justify-center gap-1"
-						>
-							<ArrowLeft className="w-4 h-4" />
-							<span className="hidden lg:inline-block pt-1 font-medium">Retour</span>
-						</a>
-					</button>
+						<ArrowLeft className="w-4 h-4" />
+						<span className="hidden lg:inline-block pt-1 font-medium">Retour</span>
+					</a>
 				) : (
 					<button
 						type="button"

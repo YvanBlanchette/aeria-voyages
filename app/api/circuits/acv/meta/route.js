@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cachedJson } from "@/lib/api-utils";
 import { ACV_DESTINATIONS, ACV_VILLES } from "@/lib/acv";
 
 export async function GET() {
@@ -11,7 +12,7 @@ export async function GET() {
 			prisma.circuits_acv.findMany({ distinct: ["categorie_duree"], select: { categorie_duree: true }, orderBy: { categorie_duree: "asc" } }),
 		]);
 
-		return NextResponse.json({
+		return cachedJson({
 			destinations: destinations.map((r) => ({
 				code: r.destination,
 				nom: ACV_DESTINATIONS[r.destination] ?? r.destination,

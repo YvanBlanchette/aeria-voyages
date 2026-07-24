@@ -1,6 +1,17 @@
 import Parser from "rss-parser";
 import MainLayout from "@/components/layout/MainLayout";
 
+export function generateMetadata() {
+	return {
+		title: "Blogue | ÆRIA Voyages",
+		description: "Récits de voyage, conseils et inspirations pour votre prochaine croisière, circuit ou escapade tout compris avec ÆRIA Voyages.",
+		openGraph: {
+			title: "Blogue | ÆRIA Voyages",
+			description: "Récits de voyage, conseils et inspirations pour votre prochaine croisière, circuit ou escapade tout compris.",
+		},
+	};
+}
+
 async function getPosts() {
 	try {
 		const parser = new Parser();

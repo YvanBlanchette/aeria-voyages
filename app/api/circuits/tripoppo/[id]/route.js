@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { parseJSON } from "@/lib/api-utils";
+import { parseJSON, cachedJson } from "@/lib/api-utils";
 
 export async function GET(request, { params }) {
 	try {
@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
 		const itineraire = itineraireRows.map((j) => ({ ...j, images: parseJSON(j.images) }));
 		const dates_prix = datesPrixRows.map((d) => ({ ...d, liens_resa: parseJSON(d.liens_resa) }));
 
-		return NextResponse.json({
+		return cachedJson({
 			...circuit,
 			source: "tripoppo",
 			prixPromo: parseFloat(circuit.prix_promo) || 0,

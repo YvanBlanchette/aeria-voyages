@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { parseJSON } from "@/lib/api-utils";
+import { parseJSON, cachedJson } from "@/lib/api-utils";
 import { ACV_DESTINATIONS, ACV_VILLES } from "@/lib/acv";
 
 export async function GET(request) {
@@ -22,7 +22,7 @@ export async function GET(request) {
 			orderBy: { prix: "asc" },
 		});
 
-		return NextResponse.json(rows.map((r) => ({
+		return cachedJson(rows.map((r) => ({
 			...r,
 			source: "acv",
 			titre: r.nom,

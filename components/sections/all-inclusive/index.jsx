@@ -1,20 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { motion } from "framer-motion";
 import { Loader2, Hotel } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { GOLD, AI_ITEMS_PER_PAGE as ITEMS_PER_PAGE } from "@/lib/constants/all-inclusive-constants";
+import { AI_ITEMS_PER_PAGE as ITEMS_PER_PAGE } from "@/lib/constants/all-inclusive-constants";
 import CarteAllInclusive from "@/components/sections/all-inclusive/components/carte-all-inclusive";
 import ModalAllInclusive from "@/components/sections/all-inclusive/components/modal-all-inclusive";
+import SectionHeader from "@/components/sections/SectionHeader";
 import { useSearch, useStaticData } from "@/lib/hooks/all-inclusive-hooks";
 import { defaultDateInput, triPackages } from "@/lib/helpers/all-inclusive-helpers";
 import SearchMenu from "./components/search-menu";
 
-export default function AllInclusivesSection() {
-	const { destinations, origines } = useStaticData();
-	const { data: tous, loading, error, fetched, execute } = useSearch();
+export default function AllInclusivesSection({ initialSearch, initialStatic }) {
+	const { destinations, origines } = useStaticData(initialStatic);
+	const { data: tous, loading, error, fetched, execute } = useSearch(initialSearch);
+	const hasFetched = useRef(false);
 
 	// ── Paramètres de fetch ──
 	const [orig, setOrig] = useState("montreal");
@@ -74,8 +75,13 @@ export default function AllInclusivesSection() {
 		setPage(1);
 	};
 
-	// Requête initiale au montage
+	// Requête initiale au montage — sautée si déjà pré-remplie côté serveur
 	useEffect(() => {
+		if (!hasFetched.current && initialSearch) {
+			hasFetched.current = true;
+			return;
+		}
+		hasFetched.current = true;
 		execute({
 			orig,
 			dest: dest[0] || "tout-le-sud",
@@ -83,6 +89,7 @@ export default function AllInclusivesSection() {
 			flex,
 			n: n[0] || "7",
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const allerPage = (p) => {
@@ -105,20 +112,11 @@ export default function AllInclusivesSection() {
 		>
 			<div className="max-w-7xl mx-auto px-4 lg:px-0">
 				{/* En-tête */}
-				<div className="text-center mb-14">
-					<Badge
-						variant="outline"
-						className="text-xs tracking-[0.4em] uppercase mb-4 rounded-full"
-						style={{ borderColor: GOLD, color: GOLD }}
-					>
-						FORFAITS TOUT INCLUS
-					</Badge>
-					<h2 className="font-serif text-4xl lg:text-5xl font-semibold text-stone-900">Forfaits Tout Inclus</h2>
-					<p className="text-stone-400 tracking-wide mt-4 text-xs max-w-lg mx-auto">
-						Des centaines d'hôtels tout inclus dans les Caraïbes et en Amérique centrale. Prix par personne, occupation double, taxes incluses.
-					</p>
-					<Separator className="w-20 h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-10" />
-				</div>
+				<SectionHeader
+					eyebrow="Forfaits tout inclus"
+					title="Forfaits Tout Inclus"
+					description="Des centaines d'hôtels tout inclus dans les Caraïbes et en Amérique centrale. Prix par personne, occupation double, taxes incluses."
+				/>
 
 				{/* ── Panneau de recherche ── */}
 				<SearchMenu
@@ -170,8 +168,7 @@ export default function AllInclusivesSection() {
 						<p className="text-stone-400 font-medium text-lg">Aucun forfait pour ces critères.</p>
 						<button
 							onClick={reset}
-							className="mt-4 text-sm font-medium hover:opacity-70 transition-opacity"
-							style={{ color: GOLD }}
+							className="mt-4 text-sm font-medium text-gold hover:opacity-70 transition-opacity"
 						>
 							Réinitialiser les filtres
 						</button>
@@ -193,7 +190,13 @@ export default function AllInclusivesSection() {
 						</div>
 
 						{/* Grille */}
-						<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+						<motion.div
+							key={page}
+							initial={{ opacity: 0, y: 16 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.5, ease: "easeOut" }}
+							className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
+						>
 							{affichees.map((f, i) => (
 								<CarteAllInclusive
 									key={`${f.id}-${i}`}
@@ -201,7 +204,7 @@ export default function AllInclusivesSection() {
 									onClick={setModalForfait}
 								/>
 							))}
-						</div>
+						</motion.div>
 
 						{/* Pagination */}
 						{nbPages > 1 && (

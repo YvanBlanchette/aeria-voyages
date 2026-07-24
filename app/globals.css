@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Raleway:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -95,8 +94,8 @@
 	--color-sidebar-ring: var(--sidebar-ring);
 
 	/* ── ÆRIA fonts ── */
-	--font-serif: "Playfair Display", serif;
-	--font-sans: "Raleway", sans-serif;
+	--font-serif: var(--font-playfair), serif;
+	--font-sans: var(--font-raleway), sans-serif;
 
 	/* ── ÆRIA colors ── */
 	--color-cream: #f8f7f4;
@@ -235,6 +234,19 @@ body {
 	.parallax-bg {
 		background-attachment: fixed;
 	}
+}
+
+/* ── Card hover lift (gold-tinted shadow, derived from --color-gold) ── */
+.card-lift {
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+.card-lift:hover {
+	box-shadow:
+		0 20px 60px color-mix(in srgb, var(--color-gold) 18%, transparent),
+		0 4px 16px rgba(0, 0, 0, 0.08),
+		0 0 0 1px color-mix(in srgb, var(--color-gold) 20%, transparent);
+	transform: translateY(-4px);
 }
 
 @keyframes fadeSlideIn {

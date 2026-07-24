@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import LandToursContent from "./components/land-tours-content";
+import SectionHeader from "@/components/sections/SectionHeader";
 import { SOURCES } from "@/lib/constants/land-tours-constants";
 
-const CircuitsSection = () => {
+const CircuitsSection = ({ initialCircuits }) => {
 	const [activeSource, setActiveSource] = useState("exoticca");
 	const source = SOURCES.find((s) => s.id === activeSource);
 
@@ -16,36 +15,32 @@ const CircuitsSection = () => {
 			className="py-20 px-6 bg-charcoal"
 		>
 			<div className="max-w-7xl mx-auto">
-				<div className="text-center mb-12">
-					<Badge
-						variant="outline"
-						className="text-xs tracking-[0.4em] uppercase mb-4 border-gold text-gold rounded-full px-3 py-1"
-					>
-						Nos Circuits terrestres
-					</Badge>
-					<h2 className="font-serif text-4xl lg:text-5xl font-semibold">Circuits d'Exception</h2>
-					<p className="text-stone-400 tracking-wide mt-4 text-xs max-w-lg mx-auto">
-						Tarifs à{" "}
-						<b>
-							<u>titre indicatif seulement</u>
-						</b>
-						, par personne en occupation double, taxes incluses. Option solo disponible sur certains circuits. Sauf mention contraire, les vols sont inclus.
-						Contactez-moi pour connaître le prix exact et planifier votre prochain voyage.
-					</p>
-					<Separator className="w-20 h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-10" />
-				</div>
+				<SectionHeader
+					dark
+					eyebrow="Nos circuits terrestres"
+					title="Circuits d'Exception"
+					description={
+						<>
+							Tarifs à{" "}
+							<b>
+								<u>titre indicatif seulement</u>
+							</b>
+							, par personne en occupation double, taxes incluses. Option solo disponible sur certains circuits. Sauf mention contraire, les vols sont inclus.
+						</>
+					}
+				/>
 
-				<div className="flex flex-wrap justify-center gap-3 mb-12">
+				<div className="flex flex-wrap justify-center gap-2 mb-12 p-1.5 bg-white/5 border border-white/10 rounded-full w-fit mx-auto">
 					{SOURCES.map((s) => {
 						const Icon = s.icon;
 						return (
 							<button
 								key={s.id}
 								onClick={() => setActiveSource(s.id)}
-								className={`flex items-center gap-2 px-6 py-3 text-sm tracking-[0.1em] uppercase font-medium transition-all duration-300 rounded-md border ${
+								className={`flex items-center gap-2 px-5 py-2.5 text-sm tracking-[0.08em] uppercase font-medium transition-all duration-300 rounded-full ${
 									activeSource === s.id
-										? "bg-gold text-white border-gold"
-										: "cursor-pointer bg-transparent text-white border-white/40 hover:border-gold hover:text-gold"
+										? "bg-gold text-white shadow-[0_4px_16px_rgba(184,147,92,0.35)]"
+										: "cursor-pointer bg-transparent text-white/70 hover:text-white"
 								}`}
 							>
 								<Icon className="size-4" />
@@ -57,6 +52,7 @@ const CircuitsSection = () => {
 				<LandToursContent
 					key={activeSource}
 					source={source}
+					initialData={activeSource === "exoticca" ? initialCircuits : undefined}
 				/>
 			</div>
 		</section>
