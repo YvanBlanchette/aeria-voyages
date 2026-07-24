@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Ship, MessageCircle, Mail, Send, Loader2, ShipIcon, MapPin, Calendar, Building2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import emailjs from "@emailjs/browser";
-import { getPorts, fmtPeriode, buildMessengerUrl, getPrixMin, partagerCroisiere } from "../../../../lib/constants/cruises-constants";
+import { getPorts, fmtPeriode, buildMessengerMessage, buildMessengerUrl, getPrixMin, partagerCroisiere } from "../../../../lib/constants/cruises-constants";
 import { Share2 } from "lucide-react";
 
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
@@ -20,6 +20,7 @@ export default function Modal({ c, onClose }) {
 	const [email, setEmail] = useState("");
 	const [message, setMessage] = useState("");
 	const [statut, setStatut] = useState(null); // "sending" | "success" | "error"
+	const [messengerStatus, setMessengerStatus] = useState(null);
 
 	useEffect(() => {
 		const fn = (e) => e.key === "Escape" && (showForm ? setShowForm(false) : onClose());
@@ -56,6 +57,22 @@ export default function Modal({ c, onClose }) {
 		} catch {
 			setStatut("error");
 		}
+	}
+
+	async function handleMessengerClick(event) {
+		event.preventDefault();
+		setMessengerStatus(null);
+
+		try {
+			if (navigator?.clipboard?.writeText) {
+				await navigator.clipboard.writeText(buildMessengerMessage(c));
+				setMessengerStatus("copied");
+			}
+		} catch {
+			setMessengerStatus("error");
+		}
+
+		window.open(msgUrl, "_blank", "noopener,noreferrer");
 	}
 
 	return (
@@ -130,11 +147,20 @@ export default function Modal({ c, onClose }) {
 										href={msgUrl}
 										target="_blank"
 										rel="noopener noreferrer"
+										onClick={handleMessengerClick}
 										className="rounded-sm flex w-full items-center justify-center gap-2.5 py-3.5 px-6 font-semibold text-sm text-white bg-[#0070da] hover:bg-[#0084ff] transition-colors duration-200"
 									>
 										<MessageCircle className="size-5" />
 										Demande via Messenger
 									</a>
+
+									{messengerStatus === "copied" && (
+										<p className="text-[11px] text-center text-stone-400">Le message a ete copie avant l ouverture de Messenger.</p>
+									)}
+
+									{messengerStatus === "error" && (
+										<p className="text-[11px] text-center text-stone-400">Messenger ouvre la conversation, mais la copie automatique du message a echoue.</p>
+									)}
 
 									{/* DEMANDE D'INFORMATION */}
 									<button
@@ -236,15 +262,15 @@ export default function Modal({ c, onClose }) {
 
 									{/* EXCURSIONS */}
 									{c["LienSEG"] && (
-									<div className="flex flex-col items-end justify-center w-1/2">
-									<a
-											href={c["LienSEG"]}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="rounded-sm flex items-center justify-center bg-[#FBAA1B] hover:bg-[#FBAA1B]/80 gap-2.5 py-3.5 px-6 font-semibold text-sm text-white bg-[#0070da] hover:bg-[#0084ff] transition-colors duration-200"
+										<div className="flex flex-col items-end justify-center w-1/2">
+											<a
+												href={c["LienSEG"]}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="rounded-sm flex items-center justify-center bg-[#FBAA1B] hover:bg-[#FBAA1B]/80 gap-2.5 py-3.5 px-6 font-semibold text-sm text-white bg-[#0070da] hover:bg-[#0084ff] transition-colors duration-200"
 											>
-											<Ship className="size-5" />
-											Excursions SEG
+												<Ship className="size-5" />
+												Excursions SEG
 											</a>
 											{/* {c["LienVentAsh"] && (
 												<a
@@ -257,8 +283,8 @@ export default function Modal({ c, onClose }) {
 													Excursions Venture Ashore
 												</a>
 											)} */}
-							</div>
-								)}
+										</div>
+									)}
 								</div>
 							)}
 						</div>

@@ -1,4 +1,5 @@
 import HeroSection from "@/components/sections/HeroSection";
+import SuppliersMarqueeSection from "@/components/sections/SuppliersMarqueeSection";
 import CircuitsSection from "@/components/sections/land-tours";
 import CroisieresSection from "@/components/sections/cruises";
 import MainLayout from "@/components/layout/MainLayout";
@@ -13,10 +14,12 @@ import { searchAllInclusive, getStaticData } from "@/lib/data/all-inclusive";
 export function generateMetadata() {
 	return {
 		title: "ÆRIA Voyages | Croisières, circuits et forfaits tout inclus",
-		description: "Agence de voyages spécialisée en croisières, circuits terrestres et forfaits tout inclus. Voyages sur mesure conçus par votre conseiller ÆRIA Voyages.",
+		description:
+			"Agence de voyages spécialisée en croisières, circuits terrestres et forfaits tout inclus. Voyages sur mesure conçus par votre conseiller ÆRIA Voyages.",
 		openGraph: {
 			title: "ÆRIA Voyages | Croisières, circuits et forfaits tout inclus",
-			description: "Agence de voyages spécialisée en croisières, circuits terrestres et forfaits tout inclus. Voyages sur mesure conçus par votre conseiller ÆRIA Voyages.",
+			description:
+				"Agence de voyages spécialisée en croisières, circuits terrestres et forfaits tout inclus. Voyages sur mesure conçus par votre conseiller ÆRIA Voyages.",
 		},
 	};
 }
@@ -33,6 +36,7 @@ export default async function HomePage() {
 	return (
 		<MainLayout navbarVariant={"dynamic"}>
 			<HeroSection />
+			<SuppliersMarqueeSection />
 			<CroisieresSection
 				initialData={croisieresInitiales}
 				initialMeta={croisieresMeta}

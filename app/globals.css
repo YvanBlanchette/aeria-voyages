@@ -141,9 +141,10 @@
 /* ─────────────────────────────────────────
    ÆRIA Voyages — Global styles
 ───────────────────────────────────────── */
-html, body {
-  overflow-x: hidden;
-  max-width: 100%;
+html,
+body {
+	overflow-x: hidden;
+	max-width: 100%;
 }
 
 body {
@@ -238,8 +239,12 @@ body {
 
 /* ── Card hover lift (gold-tinted shadow, derived from --color-gold) ── */
 .card-lift {
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.05);
-	transition: box-shadow 0.4s ease, transform 0.4s ease;
+	box-shadow:
+		0 2px 8px rgba(0, 0, 0, 0.06),
+		0 0 0 1px rgba(0, 0, 0, 0.05);
+	transition:
+		box-shadow 0.4s ease,
+		transform 0.4s ease;
 }
 .card-lift:hover {
 	box-shadow:
@@ -262,4 +267,151 @@ body {
 
 .animate-step {
 	animation: fadeSlideIn 0.35s ease forwards;
+}
+
+/* ── Suppliers marquee (premium) ── */
+.supplier-premium-section {
+	background:
+		radial-gradient(circle at 10% 14%, rgba(184, 147, 92, 0.18), transparent 36%), radial-gradient(circle at 85% 74%, rgba(176, 140, 89, 0.1), transparent 30%),
+		linear-gradient(180deg, #0f0f10 0%, #151515 52%, #101010 100%);
+}
+
+.supplier-premium-bg {
+	position: absolute;
+	pointer-events: none;
+	border-radius: 999px;
+	filter: blur(56px);
+	opacity: 0.65;
+}
+
+.supplier-premium-bg-1 {
+	height: 290px;
+	width: 290px;
+	top: -115px;
+	right: 8%;
+	background: rgba(184, 147, 92, 0.24);
+}
+
+.supplier-premium-bg-2 {
+	height: 240px;
+	width: 240px;
+	bottom: -100px;
+	left: 6%;
+	background: rgba(145, 119, 83, 0.18);
+}
+
+.supplier-marquee-wrapper {
+	position: relative;
+	overflow: hidden;
+	padding: 0 1rem;
+	mask-image: linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
+	-webkit-mask-image: linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
+}
+
+.supplier-marquee-wrapper.is-compact {
+	opacity: 0.9;
+}
+
+.supplier-marquee-track {
+	display: flex;
+	align-items: stretch;
+	gap: 1rem;
+	width: max-content;
+	animation: supplierMarqueeLeft 64s linear infinite;
+	padding-block: 0.45rem;
+}
+
+.supplier-marquee-track.is-reverse {
+	animation-name: supplierMarqueeRight;
+	animation-duration: 70s;
+}
+
+.supplier-premium-section:has(.supplier-logo-link:hover) .supplier-marquee-track,
+.supplier-premium-section:has(.supplier-logo-link:focus-visible) .supplier-marquee-track {
+	animation-play-state: paused;
+}
+
+.supplier-logo-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 180px;
+	height: 68px;
+	text-decoration: none;
+	color: inherit;
+	transition:
+		transform 0.28s ease,
+		opacity 0.28s ease;
+}
+
+.supplier-logo-link:hover {
+	transform: translateY(-2px) scale(1.03);
+}
+
+.supplier-logo-image {
+	max-height: 52px;
+	width: auto;
+	max-width: 160px;
+	object-fit: contain;
+	opacity: 0.72;
+	filter: grayscale(1) brightness(0) invert(1);
+	transition:
+		opacity 0.28s ease,
+		filter 0.28s ease,
+		transform 0.28s ease;
+}
+
+.supplier-logo-image.is-light-logo {
+	opacity: 0.76;
+}
+
+.supplier-logo-link:hover .supplier-logo-image {
+	opacity: 1;
+	filter: grayscale(1) brightness(0) invert(1) drop-shadow(0 0 14px rgba(184, 147, 92, 0.34));
+	transform: scale(1.02);
+}
+
+@keyframes supplierMarqueeLeft {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes supplierMarqueeRight {
+	from {
+		transform: translateX(-50%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@media (max-width: 1024px) {
+	.supplier-logo-link {
+		min-width: 170px;
+		height: 64px;
+	}
+}
+
+@media (max-width: 768px) {
+	.supplier-marquee-track {
+		animation-duration: 48s;
+		gap: 0.75rem;
+	}
+
+	.supplier-marquee-track.is-reverse {
+		animation-duration: 54s;
+	}
+
+	.supplier-logo-link {
+		min-width: 140px;
+		height: 58px;
+	}
+
+	.supplier-logo-image {
+		max-height: 40px;
+	}
 }
