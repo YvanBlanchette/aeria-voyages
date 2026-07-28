@@ -136,9 +136,7 @@ export default async function BloguePage({ params, searchParams }) {
 								<Link
 									href={buildHref({ page: 1, tag: "" })}
 									aria-current={!tag ? "page" : undefined}
-									className={`aeria-filter-chip ${
-										!tag ? "aeria-filter-chip-active" : "aeria-filter-chip-idle"
-									}`}
+									className={`aeria-filter-chip ${!tag ? "aeria-filter-chip-active" : "aeria-filter-chip-idle"}`}
 								>
 									{copy.all}
 								</Link>
@@ -148,9 +146,7 @@ export default async function BloguePage({ params, searchParams }) {
 									<Link
 										href={buildHref({ page: 1, tag: item.slug })}
 										aria-current={tag === item.slug ? "page" : undefined}
-										className={`aeria-filter-chip ${
-											tag === item.slug ? "aeria-filter-chip-active" : "aeria-filter-chip-idle"
-										}`}
+										className={`aeria-filter-chip ${tag === item.slug ? "aeria-filter-chip-active" : "aeria-filter-chip-idle"}`}
 									>
 										{item.name}
 									</Link>

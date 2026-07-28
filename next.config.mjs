@@ -14,6 +14,7 @@ const nextConfig = {
 			{ protocol: "https", hostname: "aeriavoyages.com" },
 			{ protocol: "https", hostname: "blog.aeriavoyages.com" },
 			{ protocol: "https", hostname: "blogue.aeriavoyages.com" },
+			{ protocol: "https", hostname: "res-4.cloudinary.com" },
 			{ protocol: "https", hostname: "static-ca.exoticca.com" },
 			{ protocol: "https", hostname: "vacations.aircanada.com" },
 			{ protocol: "https", hostname: "www.tripoppo.com" },
@@ -21,9 +22,7 @@ const nextConfig = {
 		// Le token est une chaîne base64 dynamique — pas de valeur "search" fixe
 		// possible. La route elle-même valide déjà que le token décodé pointe
 		// vers PROVIDER_BASE avant de proxifier (voir app/api/all-inclusive/img).
-		localPatterns: [
-			{ pathname: "/api/all-inclusive/img" },
-		],
+		localPatterns: [{ pathname: "/api/all-inclusive/img" }],
 	},
 	async headers() {
 		return [
