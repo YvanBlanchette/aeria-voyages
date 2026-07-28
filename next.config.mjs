@@ -18,6 +18,7 @@ const nextConfig = {
 			{ protocol: "https", hostname: "res-2.cloudinary.com" },
 			{ protocol: "https", hostname: "res-3.cloudinary.com" },
 			{ protocol: "https", hostname: "res-4.cloudinary.com" },
+			{ protocol: "https", hostname: "substack-post-media.s3.amazonaws.com" },
 			{ protocol: "https", hostname: "static-ca.exoticca.com" },
 			{ protocol: "https", hostname: "vacations.aircanada.com" },
 			{ protocol: "https", hostname: "www.tripoppo.com" },
