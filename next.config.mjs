@@ -12,6 +12,8 @@ const nextConfig = {
 	images: {
 		remotePatterns: [
 			{ protocol: "https", hostname: "aeriavoyages.com" },
+			{ protocol: "https", hostname: "blog.aeriavoyages.com" },
+			{ protocol: "https", hostname: "blogue.aeriavoyages.com" },
 			{ protocol: "https", hostname: "static-ca.exoticca.com" },
 			{ protocol: "https", hostname: "vacations.aircanada.com" },
 			{ protocol: "https", hostname: "www.tripoppo.com" },
