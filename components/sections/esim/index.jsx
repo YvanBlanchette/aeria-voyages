@@ -4,7 +4,7 @@ const ESimSection = () => {
 	return (
 		<section
 			id="esim"
-			vhassName="relative isolate overflow-hidden min-h-[70vh] h-screen"
+			chassName="relative overflow-hidden min-h-[70vh] h-screen"
 		>
 			<a
 				href="https://holafly.sjv.io/aeriavoyages"
