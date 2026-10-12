@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, IdCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { socialLinks } from "@/lib/data";
-import { FaFacebook, FaFacebookMessenger, FaTiktok, FaYoutube, FaXTwitter  } from "react-icons/fa6";
+import { FaFacebook, FaFacebookMessenger, FaTiktok, FaYoutube, FaXTwitter } from "react-icons/fa6";
 import { AiFillInstagram } from "react-icons/ai";
 
 // Mapping des icônes
@@ -14,10 +14,8 @@ const iconMap = {
 	youtube: FaYoutube,
 	messenger: FaFacebookMessenger,
 	tiktok: FaTiktok,
-	x: FaXTwitter
+	x: FaXTwitter,
 };
-
-
 
 const logoLight = "/assets/images/aeria-logo-light.svg";
 const acta = "/assets/images/partner-logo/acta-light.svg";
@@ -47,16 +45,16 @@ const Footer = () => {
 							{socialLinks.map((social) => {
 								const Icon = iconMap[social.icon];
 								return (
-										<a
-											key={social.icon}
-											href={social.href}
-											target="_blank"
-											rel="noopener noreferrer"
+									<a
+										key={social.icon}
+										href={social.href}
+										target="_blank"
+										rel="noopener noreferrer"
 										aria-label={social.label}
 										className="cursor-pointer group"
-										>
-											{Icon && <Icon className="size-[20px] text-white opacity-80 group-hover:opacity-100" />}
-										</a>
+									>
+										{Icon && <Icon className="size-[20px] text-white opacity-80 group-hover:opacity-100" />}
+									</a>
 								);
 							})}
 						</div>
@@ -97,21 +95,40 @@ const Footer = () => {
 								<span className="text-xs">
 									Détenteur d'un Permis du Québec
 									<br />
-									#703666
+									#703633
 								</span>
 							</li>
 						</ul>
 					</div>
 				</div>
 
-
 				<div className="flex justify-between items-center gap-4 w-[90%] mx-auto">
-					<img className="block h-16 lg:h-10 w-full opacity-70" src={opc} alt="OPC logo" />
-					<img className="hidden lg:block h-10 w-full opacity-70" src={aavq} alt="AAVQ logo" />
-					<img className="hidden lg:block h-8 w-full opacity-70 ml-4" src={ensemble} alt="Ensemble logo" />
-					<img className="hidden lg:block h-10 w-full opacity-70" src={acta} alt="ACTA logo" />
-					<img className="hidden lg:block h-10 w-full opacity-70" src={clia} alt="CLIA logo" />
-					<img className="hidden lg:block h-10 w-full opacity-70" src={iataTids} alt="IATA logo | TIDS logo" />
+					<img
+						className="block h-16 lg:h-10 w-full opacity-70"
+						src={opc}
+						alt="OPC logo"
+					/>
+					<img
+						className="hidden lg:block h-10 w-full opacity-70"
+						src={aavq}
+						alt="AAVQ logo"
+					/>
+					{/* <img className="hidden lg:block h-8 w-full opacity-70 ml-4" src={travelsavers} alt="Travelsavers logo" /> */}
+					<img
+						className="hidden lg:block h-10 w-full opacity-70"
+						src={acta}
+						alt="ACTA logo"
+					/>
+					<img
+						className="hidden lg:block h-10 w-full opacity-70"
+						src={clia}
+						alt="CLIA logo"
+					/>
+					<img
+						className="hidden lg:block h-10 w-full opacity-70"
+						src={iataTids}
+						alt="IATA logo | TIDS logo"
+					/>
 				</div>
 
 				<Separator className="opacity-10 mt-10" />
