@@ -64,14 +64,14 @@ const Footer = () => {
 					<div>
 						<h4 className="text-sm tracking-[0.2em] uppercase mb-2 font-semibold">Contact</h4>
 						<ul className="space-y-3 text-sm text-muted-foreground">
-							<li className="flex items-start gap-2">
+							{/* <li className="flex items-start gap-2">
 								<MapPin className="size-4 mt-1 shrink-0" />
 								<span>
 									400 - 3 Place Ville-Marie
 									<br />
 									Montréal (Québec) H3B 2E3, Canada
 								</span>
-							</li>
+							</li> */}
 							<li className="flex items-center gap-2">
 								<Phone className="size-4" />
 								<a
