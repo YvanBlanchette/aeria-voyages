@@ -4,12 +4,13 @@ const ESimSection = () => {
 	return (
 		<section
 			id="esim"
-			className="relative isolate overflow-hidden bg-stone-950"
+			vhassName="relative isolate overflow-hidden min-h-[70vh] h-screen"
 		>
 			<a
 				href="https://holafly.sjv.io/aeriavoyages"
 				target="_blank"
 				rel="noopener noreferrer"
+				className="absolute inset-0 w-full h-full"
 			>
 				<video
 					autoPlay
