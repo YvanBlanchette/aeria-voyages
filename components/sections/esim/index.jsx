@@ -17,7 +17,7 @@ const ESimSection = () => {
 					muted
 					loop
 					playsInline
-					className="absolute inset-0 w-full h-full object-cover"
+					className="w-full h-full object-cover"
 				>
 					<source
 						src={"https://cdn.aeriavoyages.com/videos/aeria/holafly.mp4"}
